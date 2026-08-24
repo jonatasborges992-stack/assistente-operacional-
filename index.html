@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Assistente Operacional — V15.1</title>
+<title>Assistente Operacional — V16.8</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#17202a}
 header{background:#17202a;color:#fff;padding:24px}header h1{margin:0 0 6px;font-size:28px}header p{margin:0;color:#cbd5e1}
@@ -66,7 +66,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;bord
 <body>
 <header>
 <h1>Assistente Operacional</h1>
-<p>V15.1 — operação prática, inteligência e gestão</p>
+<p>V16.8 — operação prática, controle e gestão</p>
 </header>
 
 
@@ -124,24 +124,6 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;bord
 </section>
 
 <section class="card">
-<h2>🧠 Análise antes de aceitar o frete</h2>
-<div class="grid">
-<div><label>Cliente</label><select id="aCliente"></select></div>
-<div><label>Veículo</label><select id="aVeiculo" onchange="syncConsumption()"></select></div>
-<div><label>Valor do frete (R$)</label><input id="aFrete" type="number" step="0.01" placeholder="4500"></div>
-<div><label>Distância total (km)</label><input id="aKm" type="number" step="0.1" placeholder="120"></div>
-<div><label>Preço do diesel (R$/L)</label><input id="aDiesel" type="number" step="0.01" placeholder="6.20"></div>
-<div><label>Consumo usado (km/L)</label><input id="aConsumo" type="number" step="0.1" placeholder="Selecione o veículo"></div>
-<div><label>Pedágio (R$)</label><input id="aPedagio" type="number" step="0.01" placeholder="80"></div>
-<div><label>Terceirização / outros (R$)</label><input id="aTerceiro" type="number" step="0.01" placeholder="400"></div>
-<div><label>Margem mínima desejada (%)</label><input id="aMeta" type="number" step="0.1" value="30" min="0" max="99.9"></div>
-</div>
-<div class="actions"><button onclick="analyze()">Analisar frete</button></div>
-<div id="analysis"></div>
-<p class="muted">Regra inicial: 🟢 aceita quando atinge a margem mínima; 🟡 exige análise quando é lucrativo, mas abaixo da meta; 🔴 não recomendado quando a margem fica muito abaixo da meta ou há prejuízo.</p>
-</section>
-
-<section class="card">
 <h2>📝 Registrar serviço</h2>
 <div class="grid">
 <div><label>Data</label><input id="sData" type="date"></div>
@@ -189,23 +171,6 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;bord
   <h2>🧠 Inteligência dos seus fretes</h2>
   <p class="muted">O sistema compara os fretes registrados e mostra o seu padrão real de operação.</p>
   <div id="historyInsights"></div>
-</section>
-
-
-<section class="card">
-  <h2>💰 Quanto cobrar?</h2>
-  <p class="muted">Informe os mesmos dados da análise do frete e o sistema calcula um preço mínimo e uma faixa recomendada para atingir sua margem.</p>
-  <div class="grid">
-    <div><label>Margem desejada (%)</label><input id="pMeta" type="number" step="0.1" value="30" min="1" max="99"></div>
-    <div><label>Margem ideal (%)</label><input id="pIdeal" type="number" step="0.1" value="35" min="1" max="99"></div>
-    <div><label>Distância total (KM)</label><input id="pKm" type="number" step="0.1" placeholder="120"></div>
-    <div><label>Consumo (KM/L)</label><input id="pConsumo" type="number" step="0.1" placeholder="2.8"></div>
-    <div><label>Preço do diesel (R$/L)</label><input id="pDiesel" type="number" step="0.01" placeholder="6.20"></div>
-    <div><label>Pedágio (R$)</label><input id="pPedagio" type="number" step="0.01" placeholder="80"></div>
-    <div><label>Terceirização / outros (R$)</label><input id="pTerceiro" type="number" step="0.01" placeholder="400"></div>
-  </div>
-  <div class="actions"><button class="green" onclick="recommendPrice()">Calcular preço recomendado</button></div>
-  <div id="priceRecommendation"></div>
 </section>
 
 
