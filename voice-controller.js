@@ -16,6 +16,11 @@ function style(d){if(d.getElementById('operaVoiceUnifiedStyle'))return;const s=d
 #operaVoiceLive{display:none;margin:9px 0;padding:10px 12px;border-radius:12px;background:#eefaf3;border:1px solid #c9ead6;color:#166534;font-size:12px;font-weight:800}#operaVoiceLive.show{display:block}
 .opv-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:8px}.opv{border:0!important;border-radius:12px!important;padding:12px 8px!important;font-weight:800!important;min-height:44px!important}.opv-main{background:linear-gradient(135deg,#118cff,#14c8ed)!important;color:#fff!important}.opv-dark{background:#142238!important;color:#fff!important}.opv-soft{background:#edf2f7!important;color:#17202a!important}.opv-danger{background:#b42318!important;color:#fff!important}.opv:disabled{opacity:.42!important}
 #operaVoiceHelp{margin-top:9px;color:#64748b;font-size:12px;line-height:1.4}@media(max-width:680px){.opv-grid{grid-template-columns:1fr 1fr}.opv-main,.opv-dark{grid-column:span 2}}
+#operaThirdPartyCard{margin-top:16px;border:1px solid #dbe4ee;border-radius:16px;padding:18px;background:linear-gradient(180deg,#fff,#f8fafc);box-shadow:0 4px 18px rgba(15,35,60,.06)}
+#operaThirdPartyCard h2{margin:0 0 6px;font-size:20px}#operaThirdPartyCard .ot-sub{margin:0 0 14px;color:#64748b;font-size:13px}
+.ot-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.ot-kpi{padding:14px;border:1px solid #e2e8f0;border-radius:12px;background:#fff}.ot-kpi span{display:block;color:#64748b;font-size:12px}.ot-kpi strong{display:block;font-size:22px;margin-top:4px}
+#operaThirdPartyTable{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px}#operaThirdPartyTable th,#operaThirdPartyTable td{padding:9px;border-bottom:1px solid #e2e8f0;text-align:left}#operaThirdPartyTable th{background:#f8fafc}
+.ot-total{border-left:5px solid #c98200}.ot-empty{padding:12px;border-radius:10px;background:#f8fafc;color:#64748b;margin-top:12px}
 `;d.head.appendChild(s)}
 function unify(d){
  const home=d.querySelector('.assist-home');
@@ -62,6 +67,41 @@ function build(d){
  function erase(){userStop=true;clearTimeout(timer);try{rec?.abort()}catch(e){}finalText='';interim='';el.value='';state='paused';const out=document.getElementById('v16Response');if(out)out.innerHTML='';try{sessionStorage.removeItem(KEY)}catch(e){}render();status.innerHTML='🗑️ <b>Tudo apagado.</b> Pode começar novamente.'}
  function finish(){finalText=clean(el.value);interim='';userStop=true;clearTimeout(timer);try{rec?.stop()}catch(e){}state='idle';el.value=finalText;try{sessionStorage.removeItem(KEY)}catch(e){}render();sendToAssistant(finalText);document.getElementById('v16Response')?.scrollIntoView({behavior:'smooth',block:'center'});status.innerHTML='✅ <b>Lançamento enviado.</b> Confira o resultado na mesma tela antes de confirmar.'}
  el.addEventListener('input',()=>{if(state!=='listening'){finalText=clean(el.value);interim='';render()}});start.onclick=listen;pause.onclick=()=>state==='paused'?listen():pauseSession();correct.onclick=correctSession;clear.onclick=erase;done.onclick=finish;load();render();window.v16HandleCommand=analyzeUnified;return true}
-function boot(){if(build(document))return;const o=new MutationObserver(()=>{if(build(document))o.disconnect()});o.observe(document.documentElement,{childList:true,subtree:true});setTimeout(()=>o.disconnect(),15000)}
+function buildThirdPartySection(d){
+ const main=d.querySelector('main');
+ if(!main||d.getElementById('operaThirdPartyCard'))return !!d.getElementById('operaThirdPartyCard');
+ style(d);
+ const panel=d.createElement('section');panel.className='card';panel.id='operaThirdPartyCard';
+ panel.innerHTML=`<h2>🚛 Gastos com fretes terceirizados</h2><p class="ot-sub">Somente valores lançados no campo <b>Terceirização</b>. Este painel não mistura combustível, pedágio, alimentação, manutenção ou outros custos.</p><div class="ot-kpis"><div class="ot-kpi ot-total"><span>Total gasto com terceirizados</span><strong id="otTotal">R$ 0,00</strong></div><div class="ot-kpi"><span>Fretes terceirizados</span><strong id="otCount">0</strong></div><div class="ot-kpi"><span>Gasto médio por frete</span><strong id="otAverage">R$ 0,00</strong></div></div><div id="otTableWrap"></div></section>`;
+ const dashboard=d.getElementById('painelGestao')||d.getElementById('cerebroOperacional');
+ if(dashboard&&dashboard.parentNode)dashboard.parentNode.insertBefore(panel,dashboard.nextSibling);else main.appendChild(panel);
+ return true;
+}
+function renderThirdPartySection(d){
+ const panel=d.getElementById('operaThirdPartyCard');
+ if(!panel||typeof db==='undefined'||!Array.isArray(db.services))return;
+ const value=s=>Number(s.ter)||Number(s.terceirizacao)||Number(s.terceirizado)||0;
+ const moneyFn=window.money||((v)=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}));
+ const clientFn=window.clientName||((id)=>db.clients?.find(c=>String(c.id)===String(id))?.nome||'Cliente não informado');
+ const escFn=window.esc||((v)=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])));
+ const dateFilter=document.getElementById('dPeriodo')?.value||'todos';
+ const now=new Date(),today=now.toISOString().slice(0,10);
+ let de='';if(dateFilter==='mes')de=new Date(now.getFullYear(),now.getMonth(),1).toISOString().slice(0,10);if(dateFilter==='hoje')de=today;
+ const rows=db.services.filter(s=>value(s)>0).filter(s=>(!de||String(s.date||'')>=de)&&(!de||String(s.date||'')<=today));
+ const total=rows.reduce((a,s)=>a+value(s),0),avg=rows.length?total/rows.length:0;
+ const set=(id,v)=>{const e=d.getElementById(id);if(e)e.textContent=v};
+ set('otTotal',moneyFn(total));set('otCount',String(rows.length));set('otAverage',moneyFn(avg));
+ const wrap=d.getElementById('otTableWrap');if(!wrap)return;
+ if(!rows.length){wrap.innerHTML='<div class="ot-empty">Nenhum gasto com frete terceirizado no período selecionado.</div>';return;}
+ const ordered=rows.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+ wrap.innerHTML=`<table id="operaThirdPartyTable"><tr><th>Data</th><th>Cliente</th><th>Rota</th><th>Gasto terceirizado</th></tr>${ordered.map(s=>`<tr><td>${escFn(s.date||'—')}</td><td>${escFn(clientFn(s.clientId))}</td><td>${escFn((s.origem||'—')+' → '+(s.destino||'—'))}</td><td><b>${moneyFn(value(s))}</b></td></tr>`).join('')}</table>`;
+}
+function buildThirdParty(d){
+ if(!buildThirdPartySection(d))return;
+ renderThirdPartySection(d);
+ let last='';
+ setInterval(()=>{try{const services=(typeof db!=='undefined'&&Array.isArray(db.services))?db.services:[];const sig=services.map(s=>`${s.id}:${s.ter||0}:${s.terceirizacao||0}:${s.terceirizado||0}:${s.date||''}`).join('|')+'|'+(document.getElementById('dPeriodo')?.value||'');if(sig!==last){last=sig;renderThirdPartySection(document)}}catch(e){}},800);
+}
+function boot(){if(build(document)){buildThirdParty(document);return;}const o=new MutationObserver(()=>{if(build(document)){buildThirdParty(document);o.disconnect()}});o.observe(document.documentElement,{childList:true,subtree:true});setTimeout(()=>o.disconnect(),15000)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
