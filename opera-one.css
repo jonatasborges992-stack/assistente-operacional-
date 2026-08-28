@@ -1,17 +1,188 @@
-/* OPERA ONE — identidade visual preservada/integrada ao Assistente Operacional */
-:root{--opera-bg:#050a14;--opera-panel:#0b1324;--opera-panel2:#101b31;--opera-blue:#168cff;--opera-cyan:#19e6ff;--opera-text:#f5f8ff;--opera-muted:#a9b7cc;--opera-border:rgba(67,190,255,.25)}
-body{background:radial-gradient(circle at 50% -10%,rgba(0,122,255,.24),transparent 35%),linear-gradient(180deg,#040914 0%,#081120 52%,#eef2f7 52%,#eef2f7 100%)!important;color:#17202a}
-header{position:relative;overflow:hidden;background:linear-gradient(135deg,#030712 0%,#07152c 52%,#020812 100%)!important;padding:28px 24px 34px!important;border-bottom:1px solid rgba(25,230,255,.28);box-shadow:0 12px 35px rgba(0,0,0,.35)}
-header:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(25,230,255,.08) 48%,transparent 70%);pointer-events:none}
-header h1{position:relative;text-transform:uppercase;letter-spacing:.16em;font-weight:900;font-size:clamp(30px,6vw,58px)!important;background:linear-gradient(90deg,#fff,#a8eaff 45%,#168cff);-webkit-background-clip:text;background-clip:text;color:transparent;margin:0 0 4px!important}
-header p{position:relative;color:#b9d9ef!important;text-transform:uppercase;letter-spacing:.22em;font-size:11px!important}
-.assist-home{max-width:1040px!important;margin:-12px auto 22px!important;position:relative;z-index:2}
-.assist-hero{background:linear-gradient(145deg,rgba(4,10,20,.98),rgba(8,25,50,.98))!important;border:1px solid var(--opera-border);box-shadow:0 18px 50px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.05);border-radius:22px!important}
-.assist-hero h2{color:var(--opera-text)!important}.assist-hero p{color:var(--opera-muted)!important}
-.assist-command textarea{background:#f8fbff!important;color:#17202a!important}
-button.green{background:linear-gradient(135deg,#0879ff,#12bfe9)!important;box-shadow:0 7px 18px rgba(0,145,255,.25)}
-.quick-actions button{background:linear-gradient(180deg,#fdfefe,#edf4fb)!important;border-color:#b8cce0!important}
-.card,.kpi,.client-card,.insight,.price-card,.profile-box,.metric,.focus-card,.tools-wrap,.result{box-shadow:0 4px 18px rgba(12,30,55,.08)}
-.card h2{color:#0b1830}
-.more-tools>summary{background:#0a1425!important;color:#fff!important;border-color:#16365a!important;box-shadow:0 8px 24px rgba(0,0,0,.14)}
-@media(max-width:680px){header{padding:22px 16px 28px!important}header h1{font-size:30px!important;letter-spacing:.1em}.assist-home{margin-top:-10px!important}.assist-hero{border-radius:18px!important}}
+/* OPERA ONE — identidade visual original / camada visual do produto */
+:root{
+  --opera-bg:#030711;
+  --opera-bg2:#071426;
+  --opera-panel:#0a1425;
+  --opera-panel2:#0e1d33;
+  --opera-blue:#168cff;
+  --opera-blue2:#0066ff;
+  --opera-cyan:#19e6ff;
+  --opera-text:#f7fbff;
+  --opera-muted:#a9bfd4;
+  --opera-border:rgba(25,230,255,.22);
+  --opera-glow:rgba(0,125,255,.30);
+}
+
+*{box-sizing:border-box}
+html{background:var(--opera-bg);scroll-behavior:smooth}
+body{
+  margin:0!important;
+  min-height:100vh;
+  font-family:Inter,Segoe UI,Arial,sans-serif!important;
+  color:#17202a;
+  background:
+    radial-gradient(900px 420px at 50% -80px,rgba(0,115,255,.30),transparent 62%),
+    radial-gradient(600px 300px at 85% 20%,rgba(25,230,255,.08),transparent 70%),
+    linear-gradient(180deg,#02060e 0%,#071326 32%,#eef3f8 32.5%,#eef3f8 100%)!important;
+}
+
+/* Cabeçalho com a linguagem visual do OPERA ONE */
+header{
+  position:relative!important;
+  overflow:hidden!important;
+  min-height:180px!important;
+  padding:42px 24px 46px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  align-items:center!important;
+  text-align:center!important;
+  background:
+    radial-gradient(ellipse at 50% 45%,rgba(0,128,255,.20),transparent 42%),
+    linear-gradient(135deg,#02050b 0%,#07152c 48%,#020711 100%)!important;
+  border-bottom:1px solid rgba(25,230,255,.30)!important;
+  box-shadow:0 18px 55px rgba(0,0,0,.48)!important;
+}
+header:before{
+  content:"";
+  position:absolute;
+  width:460px;height:460px;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  border:1px solid rgba(25,230,255,.10);
+  border-radius:50%;
+  box-shadow:0 0 80px rgba(0,115,255,.13),inset 0 0 80px rgba(0,115,255,.07);
+  pointer-events:none;
+}
+header:after{
+  content:"";
+  position:absolute;
+  left:-10%;right:-10%;bottom:0;height:2px;
+  background:linear-gradient(90deg,transparent,#168cff,#19e6ff,#168cff,transparent);
+  box-shadow:0 0 18px rgba(25,230,255,.75);
+  opacity:.75;
+}
+header h1{
+  position:relative!important;
+  z-index:2;
+  margin:0 0 9px!important;
+  text-transform:uppercase!important;
+  letter-spacing:.15em!important;
+  font-weight:900!important;
+  font-size:clamp(42px,9vw,82px)!important;
+  line-height:.92!important;
+  background:linear-gradient(105deg,#ffffff 8%,#d8f6ff 42%,#51c8ff 64%,#168cff 88%)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  color:transparent!important;
+  text-shadow:0 0 30px rgba(0,145,255,.16)!important;
+}
+header p{
+  position:relative!important;
+  z-index:2;
+  margin:0!important;
+  color:#b9dff3!important;
+  text-transform:uppercase!important;
+  letter-spacing:.30em!important;
+  font-size:11px!important;
+  font-weight:700!important;
+}
+
+/* Elementos de entrada preservam a operação, mas ganham acabamento premium */
+main{max-width:1120px!important;margin:28px auto!important;padding:0 16px!important}
+.assist-home{max-width:1040px!important;margin:-24px auto 26px!important;position:relative!important;z-index:5!important;padding:0 16px}
+.assist-hero{
+  position:relative!important;
+  overflow:hidden!important;
+  background:
+    radial-gradient(circle at 80% 10%,rgba(25,230,255,.12),transparent 28%),
+    linear-gradient(145deg,rgba(3,9,19,.99),rgba(8,24,48,.99))!important;
+  color:var(--opera-text)!important;
+  border:1px solid var(--opera-border)!important;
+  border-radius:24px!important;
+  padding:25px!important;
+  box-shadow:0 22px 60px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.06)!important;
+}
+.assist-hero:before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 15%,rgba(25,230,255,.06) 48%,transparent 75%);
+}
+.assist-hero h2{position:relative;color:#fff!important;font-size:24px!important;letter-spacing:.01em}
+.assist-hero p{position:relative;color:var(--opera-muted)!important}
+.assist-command{position:relative!important}
+.assist-command textarea{
+  background:#f8fbff!important;color:#17202a!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  border-radius:13px!important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.10)!important;
+}
+button.green{
+  background:linear-gradient(135deg,#0879ff,#13c8e8)!important;
+  color:#fff!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  box-shadow:0 8px 24px rgba(0,145,255,.30)!important;
+}
+button{transition:transform .16s ease,box-shadow .16s ease,filter .16s ease}
+button:hover{transform:translateY(-1px);filter:brightness(1.04)}
+button:active{transform:translateY(0)}
+.quick-actions{position:relative!important}
+.quick-actions button{
+  background:linear-gradient(180deg,#ffffff,#eaf3fb)!important;
+  color:#0a1830!important;
+  border:1px solid #b8cce0!important;
+  border-radius:11px!important;
+}
+
+/* Cartões */
+.card,.kpi,.client-card,.insight,.price-card,.profile-box,.metric,.focus-card,.tools-wrap,.result{
+  box-shadow:0 5px 22px rgba(10,29,54,.09)!important;
+}
+.card{
+  border:1px solid #dce5ee!important;
+  border-radius:18px!important;
+}
+.card h2{color:#07152c!important}
+.kpi{border-radius:14px!important}
+.result{border-radius:14px!important}
+.more-tools{max-width:1040px!important;margin:0 auto!important;padding:0 16px}
+.more-tools>summary{
+  background:linear-gradient(145deg,#071223,#0c1b31)!important;
+  color:#fff!important;
+  border:1px solid rgba(25,230,255,.22)!important;
+  border-radius:14px!important;
+  padding:15px 17px!important;
+  box-shadow:0 10px 30px rgba(0,0,0,.20)!important;
+}
+.more-tools[open]>summary{border-radius:14px 14px 0 0!important}
+
+/* Campos e tabelas */
+input,select,textarea{border-radius:10px!important}
+input:focus,select:focus,textarea:focus{
+  outline:none!important;
+  border-color:#36aaff!important;
+  box-shadow:0 0 0 3px rgba(22,140,255,.12)!important;
+}
+th{background:#eef4f9!important;color:#0b1830!important}
+
+/* Área de foco */
+.focus-card{border-radius:15px!important}
+.focus-card.action{border-left-color:#168cff!important}
+.focus-card.warn{border-left-color:#d28a00!important}
+.focus-card.bad{border-left-color:#c92a20!important}
+
+/* Brilho discreto nos indicadores */
+.brain-score{background:linear-gradient(90deg,#168cff,#19e6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+@media(max-width:680px){
+  body{background:linear-gradient(180deg,#02060e 0%,#071326 28%,#eef3f8 28.3%,#eef3f8 100%)!important}
+  header{min-height:145px!important;padding:28px 16px 36px!important}
+  header h1{font-size:38px!important;letter-spacing:.10em!important}
+  header p{font-size:9px!important;letter-spacing:.20em!important}
+  header:before{width:310px;height:310px}
+  .assist-home{margin:-16px auto 20px!important;padding:0 12px}
+  .assist-hero{padding:19px!important;border-radius:19px!important}
+  .assist-hero h2{font-size:21px!important}
+  .more-tools{padding:0 12px}
+  main{padding:0 12px!important;margin:20px auto!important}
+  .card{padding:17px!important;border-radius:16px!important}
+}
