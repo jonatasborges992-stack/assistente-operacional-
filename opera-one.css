@@ -1,0 +1,17 @@
+/* OPERA ONE — identidade visual preservada/integrada ao Assistente Operacional */
+:root{--opera-bg:#050a14;--opera-panel:#0b1324;--opera-panel2:#101b31;--opera-blue:#168cff;--opera-cyan:#19e6ff;--opera-text:#f5f8ff;--opera-muted:#a9b7cc;--opera-border:rgba(67,190,255,.25)}
+body{background:radial-gradient(circle at 50% -10%,rgba(0,122,255,.24),transparent 35%),linear-gradient(180deg,#040914 0%,#081120 52%,#eef2f7 52%,#eef2f7 100%)!important;color:#17202a}
+header{position:relative;overflow:hidden;background:linear-gradient(135deg,#030712 0%,#07152c 52%,#020812 100%)!important;padding:28px 24px 34px!important;border-bottom:1px solid rgba(25,230,255,.28);box-shadow:0 12px 35px rgba(0,0,0,.35)}
+header:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(25,230,255,.08) 48%,transparent 70%);pointer-events:none}
+header h1{position:relative;text-transform:uppercase;letter-spacing:.16em;font-weight:900;font-size:clamp(30px,6vw,58px)!important;background:linear-gradient(90deg,#fff,#a8eaff 45%,#168cff);-webkit-background-clip:text;background-clip:text;color:transparent;margin:0 0 4px!important}
+header p{position:relative;color:#b9d9ef!important;text-transform:uppercase;letter-spacing:.22em;font-size:11px!important}
+.assist-home{max-width:1040px!important;margin:-12px auto 22px!important;position:relative;z-index:2}
+.assist-hero{background:linear-gradient(145deg,rgba(4,10,20,.98),rgba(8,25,50,.98))!important;border:1px solid var(--opera-border);box-shadow:0 18px 50px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.05);border-radius:22px!important}
+.assist-hero h2{color:var(--opera-text)!important}.assist-hero p{color:var(--opera-muted)!important}
+.assist-command textarea{background:#f8fbff!important;color:#17202a!important}
+button.green{background:linear-gradient(135deg,#0879ff,#12bfe9)!important;box-shadow:0 7px 18px rgba(0,145,255,.25)}
+.quick-actions button{background:linear-gradient(180deg,#fdfefe,#edf4fb)!important;border-color:#b8cce0!important}
+.card,.kpi,.client-card,.insight,.price-card,.profile-box,.metric,.focus-card,.tools-wrap,.result{box-shadow:0 4px 18px rgba(12,30,55,.08)}
+.card h2{color:#0b1830}
+.more-tools>summary{background:#0a1425!important;color:#fff!important;border-color:#16365a!important;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+@media(max-width:680px){header{padding:22px 16px 28px!important}header h1{font-size:30px!important;letter-spacing:.1em}.assist-home{margin-top:-10px!important}.assist-hero{border-radius:18px!important}}
