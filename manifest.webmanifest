@@ -1,0 +1,15 @@
+{
+  "name": "OPERA ONE — Gestão Inteligente de Operações",
+  "short_name": "OPERA ONE",
+  "description": "Centro de comando inteligente para operações, fretes, custos, recebimentos e gestão.",
+  "start_url": "./app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#02050c",
+  "theme_color": "#071a39",
+  "lang": "pt-BR",
+  "icons": [
+    {"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
