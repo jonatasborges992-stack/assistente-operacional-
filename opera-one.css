@@ -1,4 +1,4 @@
-/* OPERA ONE V19 — COCKPIT OPERACIONAL INTELIGENTE */
+/* OPERA ONE V21 — cockpit operacional + entrada única */
 :root{--navy:#030812;--navy2:#07172d;--blue:#168cff;--cyan:#18e5ff;--ice:#eaf5ff;--ink:#132033;--muted:#718096;--line:#dce7f2;--green:#13a36b;--amber:#e49a21;--red:#d64545}
 *{box-sizing:border-box}
 html{background:var(--navy);scroll-behavior:smooth}
@@ -22,13 +22,12 @@ header p:after{content:"  •  SISTEMA ATIVO";color:#18e5ff;letter-spacing:.16em
 .quick-actions{position:relative!important;display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:10px!important;margin-top:12px!important}
 .quick-actions button{min-height:52px!important;background:rgba(255,255,255,.97)!important;color:#0c1a2d!important;border:1px solid #bfd2e5!important;border-radius:13px!important;box-shadow:0 5px 18px rgba(0,0,0,.14)!important}
 .quick-actions button:first-child{border-color:#35bfff!important;box-shadow:0 5px 20px rgba(22,140,255,.16)!important}
-.focus-grid{position:relative!important;display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:12px!important;margin-top:14px!important}
-.focus-card{position:relative!important;overflow:hidden!important;background:linear-gradient(180deg,#fff,#f6faff)!important;border:1px solid var(--line)!important;border-radius:17px!important;padding:17px!important;box-shadow:0 10px 28px rgba(12,34,58,.10)!important}
-.focus-card:after{content:"";position:absolute;right:-22px;bottom:-30px;width:90px;height:90px;border-radius:50%;background:rgba(22,140,255,.045)}
-.focus-card span{font-size:11px!important;text-transform:uppercase!important;letter-spacing:.08em!important;font-weight:800!important;color:#7890a7!important}.focus-card strong{font-size:23px!important;color:#132033!important}.focus-card p{color:#617286!important;line-height:1.45!important}
-.focus-card.action{border-left:4px solid var(--blue)!important}.focus-card.warn{border-left:4px solid var(--amber)!important}.focus-card.bad{border-left:4px solid var(--red)!important}
+.focus-grid{display:none!important}
 main{max-width:1120px!important;margin:24px auto!important;padding:0 16px!important}
 .more-tools{max-width:1120px!important;margin:0 auto!important;padding:0 16px!important}.more-tools>summary{position:relative!important;background:linear-gradient(145deg,#071324,#0b203b)!important;color:#fff!important;border:1px solid rgba(24,229,255,.20)!important;border-radius:15px!important;padding:16px 18px!important;font-weight:850!important;box-shadow:0 12px 32px rgba(0,0,0,.25)!important}.more-tools>summary:after{content:"CENTRAL DE OPERAÇÃO";float:right;color:#55d5ff;font-size:10px;letter-spacing:.12em;padding-top:2px}.more-tools[open]>summary{border-radius:15px 15px 0 0!important}
+/* V21: não existem duas áreas de lançamento. A seção antiga de Assistente Inteligente
+   dentro de Mais ferramentas fica oculta; os demais módulos continuam disponíveis. */
+.more-tools main>section.card:first-child{display:none!important}
 .card{background:rgba(255,255,255,.98)!important;border:1px solid var(--line)!important;border-radius:19px!important;padding:21px!important;margin-bottom:17px!important;box-shadow:0 10px 30px rgba(12,34,58,.08)!important}.card h2{color:#0a1930!important;font-size:20px!important}.muted{color:#6e8093!important}
 .kpis{gap:12px!important}.kpi{position:relative!important;overflow:hidden!important;border:1px solid var(--line)!important;border-radius:15px!important;background:linear-gradient(180deg,#fff,#f7fbff)!important;box-shadow:0 7px 22px rgba(12,34,58,.07)!important}.kpi:after{content:"";position:absolute;right:-24px;top:-24px;width:75px;height:75px;border-radius:50%;background:rgba(22,140,255,.05)}.kpi strong{color:#111f31!important}
 .metric,.insight,.price-card,.profile-box,.client-card{border:1px solid var(--line)!important;border-radius:15px!important;background:linear-gradient(180deg,#fff,#f8fbfe)!important;box-shadow:0 7px 22px rgba(12,34,58,.07)!important}
@@ -38,13 +37,9 @@ input,select,textarea{border:1px solid #cfdae5!important;border-radius:10px!impo
 button{border-radius:10px!important}button.green{background:linear-gradient(135deg,#0879ff,#18cfe9)!important}
 th{background:#edf4fa!important;color:#122238!important}
 button,.focus-card,.kpi,.metric,.insight,.price-card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease!important}button:hover,.focus-card:hover,.kpi:hover,.metric:hover,.insight:hover,.price-card:hover{transform:translateY(-2px)!important;box-shadow:0 13px 32px rgba(12,34,58,.12)!important}
-@media(max-width:760px){body{background:linear-gradient(180deg,#02050b 0,#07152a 26%,#eef3f8 26.4%,#eef3f8 100%)!important}header{min-height:205px!important;padding:28px 14px 58px!important}header h1{font-size:49px!important;letter-spacing:.07em!important}header p{font-size:8px!important;letter-spacing:.18em!important}.assist-home{margin:-38px auto 22px!important;padding:0 11px!important}.assist-hero{border-radius:21px!important;padding:19px!important}.assist-hero h2{font-size:22px!important}.assist-command{grid-template-columns:1fr!important}.assist-command button{height:52px!important}.quick-actions{grid-template-columns:repeat(2,1fr)!important}.quick-actions button{min-height:49px!important}.focus-grid{grid-template-columns:repeat(2,1fr)!important}.focus-card{padding:14px!important}.focus-card strong{font-size:19px!important}.more-tools,main{padding:0 11px!important}.card{padding:17px!important;border-radius:16px!important}.more-tools>summary:after{display:none}}
-@media(max-width:420px){header h1{font-size:42px!important}.focus-grid{gap:8px!important}.quick-actions{gap:8px!important}.quick-actions button{font-size:13px!important}}
-
-/* V20 — a tela principal mostra somente a operação em andamento.
-   Os cartões "Hoje/Lucro/A Receber/Próxima ação" eram histórico acumulado
-   e não representam o lançamento que está sendo informado agora. */
-.focus-grid{display:none!important}
+@media(max-width:760px){body{background:linear-gradient(180deg,#02050b 0,#07152a 26%,#eef3f8 26.4%,#eef3f8 100%)!important}header{min-height:205px!important;padding:28px 14px 58px!important}header h1{font-size:49px!important;letter-spacing:.07em!important}header p{font-size:8px!important;letter-spacing:.18em!important}.assist-home{margin:-38px auto 22px!important;padding:0 11px!important}.assist-hero{border-radius:21px!important;padding:19px!important}.assist-hero h2{font-size:22px!important}.assist-command{grid-template-columns:1fr!important}.assist-command button{height:52px!important}.quick-actions{grid-template-columns:repeat(2,1fr)!important}.quick-actions button{min-height:49px!important}.more-tools,main{padding:0 11px!important}.card{padding:17px!important;border-radius:16px!important}.more-tools>summary:after{display:none}}
+@media(max-width:420px){header h1{font-size:42px!important}.quick-actions{gap:8px!important}.quick-actions button{font-size:13px!important}}
 .assist-response .result{margin-top:12px!important;background:linear-gradient(180deg,#f8fcff,#eef7ff)!important;border:1px solid #b9ddf5!important;border-left:5px solid var(--blue)!important;color:#132033!important}
 .assist-response .result b{color:#10253f!important}
+#operaVoicePanel{position:relative;z-index:5}
 @media(max-width:760px){.assist-response .result{margin-top:10px!important}}
