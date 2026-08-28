@@ -1,2 +1,2 @@
-/* OPERA ONE V8.4.1 — loader seguro + auditoria */
-(function(){'use strict';var v='8.4.1',f=['opera-intelligence-core.js','opera-intelligence-entities.js','opera-intelligence-parser.js','opera-intelligence-ui.js','opera-intelligence-tests.js'];function n(i){if(i>=f.length)return;var s=document.createElement('script');s.src=f[i]+'?v='+v;s.onload=function(){n(i+1)};s.onerror=function(){console.warn('OPERA ONE: módulo não carregado',f[i]);n(i+1)};document.head.appendChild(s)}n(0)})();
+/* OPERA ONE V8.4.2 — loader seguro + auditoria */
+(function(){'use strict';var v='8.4.2',f=['opera-intelligence-core.js','opera-intelligence-entities.js','opera-intelligence-parser.js','opera-intelligence-ui.js','opera-intelligence-tests.js'];function n(i){if(i>=f.length)return;var s=document.createElement('script');s.src=f[i]+'?v='+v;s.onload=function(){n(i+1)};s.onerror=function(){console.warn('OPERA ONE: módulo não carregado',f[i]);n(i+1)};document.head.appendChild(s)}n(0)})();
