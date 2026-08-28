@@ -1,23 +1,12 @@
-/* OPERA ONE — Motor de interpretação V2
-   Prévia parcial: calcula tudo que foi dito, mesmo se faltar um dado para registrar.
-   Não inventa custos. Mostra pendências separadamente.
+/* OPERA ONE — Inteligência central V3
+   O projeto possui um único motor de interpretação operacional: opera-fix-v5.js.
+   Este arquivo não substitui o motor principal nem cria uma segunda lógica de lançamento.
+   Ele apenas registra que a camada de inteligência está conectada à entrada única.
 */
-(function(){'use strict';
-const clean=s=>String(s||'').replace(/\s+/g,' ').trim();
-const norm=s=>clean(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-const money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-function num(s){let x=String(s||'').replace(/R\$/ig,'').replace(/\s/g,'').trim();if(!x)return 0;if(x.includes(',')&&x.includes('.'))return Number(x.replace(/\./g,'').replace(',','.'))||0;if(x.includes(','))return Number(x.replace(',','.'))||0;return Number(x)||0}
-function pick(text,patterns){for(const r of patterns){const m=text.match(r);if(m)return num(m[1])}return 0}
-function cost(text,labels){const l=labels.map(norm).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');const n='([0-9]+(?:[.,][0-9]{1,2})?)';const p=[new RegExp('(?:'+l+')\\s*(?:(?:de|do|da|com|em|por|no valor de)\\s*)?r?\\$?\\s*'+n,'i'),new RegExp('r?\\$?\\s*'+n+'\\s*(?:de|do|da|com|em|por)?\\s*(?:'+l+')(?=\\s|,|;|\\.|$)','i')];return pick(text,p)}
-function hours(text){const t=norm(text);const h=t.match(/\b(\d+(?:[.,]\d+)?)\s*horas?\s*(?:extras?|extra)\b/);if(!h)return {qtd:0,rate:0,total:0,missing:false};const qtd=num(h[1]);let rate=pick(t,[/\b\d+(?:[.,]\d+)?\s*horas?\s*(?:extras?|extra)\s*(?:a|de|por|no valor de|:)?\s*r?\$?\s*([0-9][0-9.,]*)/i,/\bvalor\s+(?:da|de)\s*(?:hora|horas?)\s*(?:extra)?\s*(?:é|e|de|:)?\s*r?\$?\s*([0-9][0-9.,]*)/i]);return {qtd,rate,total:qtd*rate,missing:qtd>0&&!rate}}
-function interpret(){const el=document.getElementById('smartText');const box=document.getElementById('smartResult');if(!el||!box)return;const raw=clean(el.value);if(!raw){box.innerHTML='';return}const t=norm(raw);const db=window.db||null;let client=null;try{client=(window.findClientInText?window.findClientInText(raw):null)}catch(e){}
-let value=pick(raw,[/(?:frete|faturamento)\s*(?:de|no\s+valor\s+de|por|no\s+valor)\s*(?:r?\$)?\s*([0-9][0-9.,]*)/i,/(?:por|valor(?:\s+do\s+frete)?|no\s+valor\s+de)\s*r?\$?\s*([0-9][0-9.,]*)/i,/r?\$\s*([0-9][0-9.,]*)/i]);
-const fuel=cost(raw,['diesel','combustivel','combustível']);const toll=cost(raw,['pedagio','pedágio']);const food=cost(raw,['alimentacao','alimentação','refeicao','refeição']);const hotel=cost(raw,['hotel','hospedagem']);const third=cost(raw,['terceirizacao','terceirização','terceirizado','terceiro']);const maintenance=cost(raw,['manutencao','manutenção','manutencao do veiculo','manutenção do veículo','oficina','reparo']);const hx=hours(raw);const costs=fuel+toll+food+hotel+third+maintenance+hx.total;const profit=value-costs;const margin=value?profit/value*100:0;
-let route=null;const m=raw.match(/\b(?:de|saindo de)\s+(.+?)\s+(?:para|até|ate)\s+(.+?)(?=\s+(?:por|no valor|com|e|gast|gastei|mais)\b|\s*,|$)/i);if(m)route=[clean(m[1]),clean(m[2])];
-const missing=[];if(!value)missing.push('valor do frete');if(!client)missing.push('cliente cadastrado');if(!route)missing.push('origem e destino');if(hx.missing)missing.push('valor da hora extra');
-const partial=costs>0&&value>0;const cls=value&&profit>0?'good':value&&profit<0?'bad':'warn';
-box.innerHTML=`<div class="result ${cls}" style="padding:18px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><b style="font-size:18px">${value&&profit>0?'🟢 OPERAÇÃO POSITIVA':value&&profit<0?'🔴 OPERAÇÃO COM PREJUÍZO':'🟡 PRÉVIA INTELIGENTE'}</b><div class="muted" style="margin-top:4px">O sistema calculou somente o que foi realmente informado.</div></div><span class="badge">${missing.length?'Pendente':'Pronto para registrar'}</span></div><div class="kpis"><div class="kpi"><span>Frete</span><strong>${money(value)}</strong></div><div class="kpi"><span>Custos informados</span><strong>${money(costs)}</strong></div><div class="kpi"><span>Lucro ${partial?'calculado':'estimado'}</span><strong>${money(profit)}</strong></div><div class="kpi"><span>Margem</span><strong>${value?margin.toFixed(1)+'%':'—'}</strong></div></div><p><b>Cliente:</b> ${esc(client?.nome||'Não cadastrado')}<br><b>Rota:</b> ${route?esc(route[0])+' → '+esc(route[1]):'Não identificada'}<br><b>Custos:</b> Combustível ${money(fuel)} • Pedágio ${money(toll)} • Alimentação ${money(food)} • Hotel ${money(hotel)} • Manutenção ${money(maintenance)} • Terceirização ${money(third)} • Horas extras ${money(hx.total)}</p>${hx.qtd?`<p><b>Horas extras:</b> ${hx.qtd}h × ${money(hx.rate)}/h = ${money(hx.total)}${hx.missing?' — falta informar o valor/hora':''}</p>`:''}${missing.length?`<div class="brain-alert warn"><b>⚠️ Ainda falta:</b> ${missing.join(' • ')}</div>`:`<div class="actions"><button class="green" onclick='confirmSmart(${JSON.stringify({clientId:client.id,value,combust,toll,food,hotel,third,driverDailyCount:0,driverDailyUnit:0,driverDailyTotal:0,driverExtraHours:hx.qtd,driverExtraRate:hx.rate,driverExtraTotal:hx.total,maintenance,route:route||['',''],km:0,vehicleId:null})})'>✓ Confirmar e registrar</button><button class="secondary" onclick="smartText.focus()">✏️ Corrigir texto</button></div>`}</div>`;
-}
-window.addEventListener('load',()=>{const old=window.interpretSmart;window.interpretSmart=interpret;const el=document.getElementById('smartText');if(el)el.addEventListener('input',()=>{if(el.value.trim()){} });});
+(function(){
+  'use strict';
+  window.OPERA_ONE_INTELLIGENCE = window.OPERA_ONE_INTELLIGENCE || {};
+  window.OPERA_ONE_INTELLIGENCE.connected = true;
+  window.OPERA_ONE_INTELLIGENCE.engine = 'opera-fix-v5';
+  window.OPERA_ONE_INTELLIGENCE.version = 'V3';
 })();
