@@ -1,0 +1,33 @@
+name: Apply OPERA ONE theme
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  theme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inject OPERA ONE identity
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          link='<link rel="stylesheet" href="opera-one.css">'
+          if link not in s:
+              s=s.replace('</head>', link+'\n</head>',1)
+          s=s.replace('<title>Assistente Operacional — V16.9 Voz Auditada</title>','<title>OPERA ONE — Gestão Inteligente de Operações</title>',1)
+          s=s.replace('<h1>Assistente Operacional</h1>','<h1>OPERA ONE</h1>',1)
+          s=s.replace('<p>V16.8 — Rota Integrada — operação prática, inteligência e gestão</p>','<p>Gestão inteligente de operações</p>',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit theme if changed
+        run: |
+          git config user.name 'OPERA ONE Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m 'feat: aplicar identidade visual OPERA ONE'
+          git push
