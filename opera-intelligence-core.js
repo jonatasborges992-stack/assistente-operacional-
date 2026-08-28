@@ -1,0 +1,7 @@
+/* OPERA ONE intelligence core */
+window.OPERA_AI=window.OPERA_AI||{};
+OPERA_AI.norm=function(s){return String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim()};
+OPERA_AI.money=function(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})};
+OPERA_AI.words={zero:0,um:1,uma:1,dois:2,duas:2,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12,treze:13,quatorze:14,quinze:15,dezesseis:16,dezessete:17,dezoito:18,dezenove:19,vinte:20,trinta:30,quarenta:40,cinquenta:50,sessenta:60,setenta:70,oitenta:80,noventa:90,cem:100,cento:100,duzentos:200,trezentos:300,quatrocentos:400,quinhentos:500,seiscentos:600,setecentos:700,oitocentos:800,novecentos:900};
+OPERA_AI.num=function(v){let s=String(v??'').trim().toLowerCase().replace(/r\$/g,'').replace(/reais?/g,'').replace(/\s/g,'');if(!s)return 0;let m=/^([0-9]+(?:[.,][0-9]+)?)mil$/.exec(s);if(m)return OPERA_AI.num(m[1])*1000;if(/^[a-z]+$/.test(s)&&OPERA_AI.words[s]!=null)return OPERA_AI.words[s];if(s.includes('.')&&s.includes(','))s=s.replace(/\./g,'').replace(',','.');else if(s.includes(','))s=s.replace(',','.');else if(/^\d+\.\d{3}$/.test(s))s=s.replace('.','');return Number(s)||0};
+OPERA_AI.AM='(?:[0-9]+(?:[.,][0-9]+)?(?:\\s*mil)?|um|uma|dois|duas|tres|quatro|cinco|seis|sete|oito|nove|dez|onze|doze|treze|quatorze|quinze|dezesseis|dezessete|dezoito|dezenove|vin
