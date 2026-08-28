@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Assistente Operacional — Administração</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#17202a}header{background:#17202a;color:#fff;padding:22px}header h1{margin:0 0 5px}.wrap{max-width:1100px;margin:auto;padding:18px}.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 3px 14px #0001}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}input,select{width:100%;padding:11px;border:1px solid #d7dee7;border-radius:8px}button{border:0;border-radius:8px;padding:10px 13px;font-weight:bold;cursor:pointer;background:#17202a;color:#fff}button.green{background:#16803c}button.red{background:#b42318}button.gray{background:#e8edf2;color:#17202a}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left}.badge{display:inline-block;padding:5px 8px;border-radius:99px;font-size:12px;font-weight:bold}.active{background:#dcfce7;color:#166534}.trial{background:#fef3c7;color:#92400e}.blocked{background:#fee2e2;color:#991b1b}.inactive{background:#e5e7eb;color:#374151}.muted{color:#64748b;font-size:13px}
+</style></head>
+<body>
+<header><h1>👑 Administração — Assistente Operacional</h1><div>Controle de clientes, testes e assinaturas</div></header>
+<div class="wrap">
+<section class="card"><h2>➕ Novo cliente</h2><div class="grid"><div><label>Empresa / cliente</label><input id="name" placeholder="Ex.: Transportadora ABC"></div><div><label>E-mail</label><input id="email" type="email" placeholder="cliente@email.com"></div><div><label>Plano</label><select id="plan"><option>Profissional</option><option>Empresarial</option><option>Personalizado</option></select></div><div><label>Teste (dias)</label><input id="trial" type="number" min="0" value="30"></div></div><div class="actions"><button class="green" onclick="createClient()">Criar e liberar teste</button></div><p class="muted">O teste é configurável. Depois poderemos ligar este cadastro ao gateway de pagamento para ativação automática.</p></section>
+<section class="card"><h2>📊 Clientes</h2><div id="stats" class="muted"></div><div style="overflow:auto"><table><thead><tr><th>Cliente</th><th>Plano</th><th>Status</th><th>Vencimento</th><th>Ações</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<section class="card"><h2>💳 Regra comercial</h2><p>Pagamento confirmado → <b>ATIVO</b>. Pagamento não confirmado após vencimento → <b>BLOQUEADO</b>. Você pode liberar manualmente por qualquer período para demonstração, teste ou cliente especial.</p><p class="muted">Nesta primeira camada, o controle é local ao painel. A ativação automática por pagamento exige um gateway + webhook + banco seguro; não vou fingir que isso está integrado sem essas credenciais/serviços.</p></section>
+</div>
+<script>
+const KEY='ao_license_clients_v1';let clients=JSON.parse(localStorage.getItem(KEY)||'[]');
+const iso=d=>new Date(d).toISOString().slice(0,10);
+function save(){localStorage.setItem(KEY,JSON.stringify(clients));render();}
+function addDays(date,n){const d=new Date(date);d.setDate(d.getDate()+Number(n));return d}
+function status(c){if(c.manualStatus==='active')return 'active';if(c.manualStatus==='blocked')return 'blocked';if(c.expiresAt&&new Date(c.expiresAt+'T23:59:59')<new Date())return 'blocked';return c.trial?'trial':'inactive'}
+function createClient(){const name=document.getElementById('name').value.trim();if(!name)return alert('Informe o cliente.');const days=Math.max(0,Number(document.getElementById('trial').value||0));const now=new Date();clients.push({id:crypto.randomUUID(),name,email:document.getElementById('email').value.trim(),plan:document.getElementById('plan').value,trial:days>0,createdAt:iso(now),expiresAt:iso(addDays(now,days)),manualStatus:days>0?'active':'inactive',paymentStatus:'unpaid'});save();document.getElementById('name').value='';document.getElementById('email').value='';}
+function activate(id,days){const c=clients.find(x=>x.id===id);if(!c)return;c.manualStatus='active';c.trial=false;c.expiresAt=iso(addDays(new Date(),Number(days||30)));save()}
+function block(id){const c=clients.find(x=>x.id===id);if(!c)return;c.manualStatus='blocked';save()}
+function reactivate(id,days){activate(id,days)}
+function render(){const rows=document.getElementById('rows');rows.innerHTML='';clients.forEach(c=>{const s=status(c);const label={active:'ATIVO',trial:'EM TESTE',blocked:'BLOQUEADO',inactive:'INATIVO'}[s];const tr=document.createElement('tr');tr.innerHTML=`<td><b>${esc(c.name)}</b><br><span class="muted">${esc(c.email||'')}</span></td><td>${esc(c.plan)}</td><td><span class="badge ${s}">${label}</span></td><td>${c.expiresAt||'—'}</td><td><div class="actions"><button class="green" onclick="activate('${c.id}',30)">Ativar 30d</button><button class="gray" onclick="activate('${c.id}',90)">Ativar 90d</button><button class="red" onclick="block('${c.id}')">Bloquear</button></div></td>`;rows.appendChild(tr)});document.getElementById('stats').textContent=`${clients.length} cliente(s) • ${clients.filter(c=>status(c)==='active').length} ativo(s) • ${clients.filter(c=>status(c)==='trial').length} em teste • ${clients.filter(c=>status(c)==='blocked').length} bloqueado(s)`}
+function esc(v){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}render();
+</script></body></html>
