@@ -1,11 +1,12 @@
-/* OPERA ONE — Voz + Assistente Inteligente V6
-   Entrada única na primeira tela: teclado e voz usam o mesmo Assistente Inteligente.
-   O botão principal da primeira tela também usa o mesmo interpretador.
+/* OPERA ONE — Voz + Assistente Inteligente V7
+   Entrada única real: teclado e voz usam a primeira tela.
+   O motor operacional continua sendo o mesmo (opera-fix-v5.js), mas o resultado
+   volta para a primeira tela. A área antiga de lançamento não é usada nem aberta.
 */
 (function(){
 'use strict';
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-const KEY='opera_one_voice_unified_v6';
+const KEY='opera_one_voice_unified_v7';
 let rec=null,state='idle',finalText='',interim='',timer=null,userStop=false;
 const input=()=>document.getElementById('v16Command');
 const clean=s=>String(s||'').replace(/\s+/g,' ').trim();
@@ -24,25 +25,32 @@ function unify(d){
 }
 function save(){try{sessionStorage.setItem(KEY,JSON.stringify({text:clean(finalText),state}))}catch(e){}}
 function load(){try{const x=JSON.parse(sessionStorage.getItem(KEY)||'null');if(x&&x.text){finalText=clean(x.text);state='paused'}}catch(e){}}
+function renderResult(){
+ const smart=document.getElementById('smartResult'),main=document.getElementById('v16Response');
+ if(!smart||!main)return false;
+ main.innerHTML=smart.innerHTML;
+ return true;
+}
 function sendToAssistant(text){
  const smart=document.getElementById('smartText');if(!smart)return false;
  smart.value=clean(text);
- if(typeof window.interpretSmart==='function'){try{window.interpretSmart();return true}catch(e){console.error(e)}}
+ if(typeof window.interpretSmart==='function'){
+   try{window.interpretSmart();renderResult();return true}catch(e){console.error(e)}
+ }
  return false;
 }
 function analyzeUnified(){
  const el=input();if(!el)return;
  const text=clean(el.value);if(!text)return;
- sendToAssistant(text);
- const tools=document.querySelector('.more-tools');if(tools)tools.setAttribute('open','');
- setTimeout(()=>document.getElementById('smartResult')?.scrollIntoView({behavior:'smooth',block:'center'}),80);
+ if(!sendToAssistant(text)){const out=document.getElementById('v16Response');if(out)out.innerHTML='<div class="result bad"><b>Não consegui iniciar o Assistente.</b><p>Atualize a página e tente novamente.</p></div>';return;}
+ document.getElementById('v16Response')?.scrollIntoView({behavior:'smooth',block:'center'});
 }
 function build(d){
  const el=input();if(!el)return false;unify(d);if(d.getElementById('operaVoicePanel')){window.v16HandleCommand=analyzeUnified;return true}style(d);
  const command=el.parentElement;
  const resolver=command?.querySelector('button');
  if(resolver){resolver.textContent='Analisar operação';resolver.className='green';resolver.onclick=analyzeUnified}
- const p=d.createElement('section');p.id='operaVoicePanel';p.innerHTML=`<p id="operaVoiceStatus">🎙️ <b>Assistente pronto.</b> Fale naturalmente ou digite seu lançamento.</p><div class="opv-grid"><button type="button" id="operaVoiceStart" class="opv opv-main">🎙️ Falar</button><button type="button" id="operaVoicePause" class="opv opv-soft" disabled>⏸️ Pausar</button><button type="button" id="operaVoiceCorrect" class="opv opv-soft" disabled>✏️ Corrigir</button><button type="button" id="operaVoiceClear" class="opv opv-danger" disabled>🗑️ Apagar tudo</button><button type="button" id="operaVoiceDone" class="opv opv-dark" disabled>✓ Concluir e analisar</button></div><div id="operaVoiceLive">🟢 <b>Ouvindo continuamente.</b> Pode fazer pausas; o texto fica protegido.</div><div id="operaVoiceHelp">✏️ <b>Uma única entrada:</b> o que você falar ou digitar aqui será enviado ao mesmo Assistente Inteligente. Não é necessário lançar o frete novamente em outra tela.</div>`;
+ const p=d.createElement('section');p.id='operaVoicePanel';p.innerHTML=`<p id="operaVoiceStatus">🎙️ <b>Assistente pronto.</b> Fale naturalmente ou digite seu lançamento.</p><div class="opv-grid"><button type="button" id="operaVoiceStart" class="opv opv-main">🎙️ Falar</button><button type="button" id="operaVoicePause" class="opv opv-soft" disabled>⏸️ Pausar</button><button type="button" id="operaVoiceCorrect" class="opv opv-soft" disabled>✏️ Corrigir</button><button type="button" id="operaVoiceClear" class="opv opv-danger" disabled>🗑️ Apagar tudo</button><button type="button" id="operaVoiceDone" class="opv opv-dark" disabled>✓ Concluir e analisar</button></div><div id="operaVoiceLive">🟢 <b>Ouvindo continuamente.</b> Pode fazer pausas; o texto fica protegido.</div><div id="operaVoiceHelp">✏️ <b>Uma única entrada:</b> o que você falar ou digitar aqui será enviado ao mesmo Assistente Inteligente e o resultado aparecerá nesta mesma tela.</div>`;
  el.parentNode.insertBefore(p,el.nextSibling);
  const $=id=>p.querySelector('#'+id),start=$('operaVoiceStart'),pause=$('operaVoicePause'),correct=$('operaVoiceCorrect'),clear=$('operaVoiceClear'),done=$('operaVoiceDone'),status=$('operaVoiceStatus'),live=$('operaVoiceLive');
  function render(){if(state==='listening')el.value=clean(finalText+' '+interim);else if(state!=='idle')el.value=clean(finalText);const has=!!clean(el.value),listening=state==='listening';start.disabled=listening;start.textContent=listening?'🎙️ Ouvindo…':'🎙️ Falar';pause.disabled=state==='idle';pause.textContent=state==='paused'?'▶️ Continuar':'⏸️ Pausar';correct.disabled=!has;clear.disabled=!has;done.disabled=!has;live.classList.toggle('show',listening);status.classList.toggle('live',listening);if(listening)status.innerHTML='🟢 <b>Ouvindo…</b> silêncio não encerra. O texto continua protegido.';else if(state==='paused')status.innerHTML='⏸️ <b>Pausado.</b> Você pode corrigir, apagar ou continuar.';else status.innerHTML='🎙️ <b>Assistente pronto.</b> Fale naturalmente ou digite e depois analise.';save()}
@@ -51,8 +59,8 @@ function build(d){
  async function listen(){if(state==='paused'){finalText=clean(el.value);interim=''}if(!await permission())return;if(!rec&&!setup())return;userStop=false;clearTimeout(timer);state='listening';render();try{rec.start()}catch(e){try{rec.stop()}catch(_){}setTimeout(()=>{try{rec.start()}catch(_){}},250)}}
  function pauseSession(){finalText=clean(el.value);interim='';state='paused';userStop=true;clearTimeout(timer);try{rec?.stop()}catch(e){}render();el.focus()}
  function correctSession(){if(state==='listening')pauseSession();else{finalText=clean(el.value);el.focus()}status.innerHTML='✏️ <b>Modo correção.</b> Ajuste o texto e continue.';save()}
- function erase(){userStop=true;clearTimeout(timer);try{rec?.abort()}catch(e){}finalText='';interim='';el.value='';state='paused';try{sessionStorage.removeItem(KEY)}catch(e){}render();status.innerHTML='🗑️ <b>Tudo apagado.</b> Pode começar novamente.'}
- function finish(){finalText=clean(el.value);interim='';userStop=true;clearTimeout(timer);try{rec?.stop()}catch(e){}state='idle';el.value=finalText;try{sessionStorage.removeItem(KEY)}catch(e){}render();sendToAssistant(finalText);const tools=document.querySelector('.more-tools');if(tools)tools.setAttribute('open','');setTimeout(()=>document.getElementById('smartResult')?.scrollIntoView({behavior:'smooth',block:'center'}),80);status.innerHTML='✅ <b>Lançamento enviado ao Assistente.</b> Confira os dados antes de confirmar.'}
+ function erase(){userStop=true;clearTimeout(timer);try{rec?.abort()}catch(e){}finalText='';interim='';el.value='';state='paused';const out=document.getElementById('v16Response');if(out)out.innerHTML='';try{sessionStorage.removeItem(KEY)}catch(e){}render();status.innerHTML='🗑️ <b>Tudo apagado.</b> Pode começar novamente.'}
+ function finish(){finalText=clean(el.value);interim='';userStop=true;clearTimeout(timer);try{rec?.stop()}catch(e){}state='idle';el.value=finalText;try{sessionStorage.removeItem(KEY)}catch(e){}render();sendToAssistant(finalText);document.getElementById('v16Response')?.scrollIntoView({behavior:'smooth',block:'center'});status.innerHTML='✅ <b>Lançamento enviado.</b> Confira o resultado na mesma tela antes de confirmar.'}
  el.addEventListener('input',()=>{if(state!=='listening'){finalText=clean(el.value);interim='';render()}});start.onclick=listen;pause.onclick=()=>state==='paused'?listen():pauseSession();correct.onclick=correctSession;clear.onclick=erase;done.onclick=finish;load();render();window.v16HandleCommand=analyzeUnified;return true}
 function boot(){if(build(document))return;const o=new MutationObserver(()=>{if(build(document))o.disconnect()});o.observe(document.documentElement,{childList:true,subtree:true});setTimeout(()=>o.disconnect(),15000)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
