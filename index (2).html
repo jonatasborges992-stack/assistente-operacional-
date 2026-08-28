@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assistente Operacional — V16.9 Voz Auditada</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#17202a}
+header{background:#17202a;color:#fff;padding:24px}header h1{margin:0 0 6px;font-size:28px}header p{margin:0;color:#cbd5e1}
+main{max-width:1200px;margin:22px auto;padding:0 16px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 3px 15px #00000012;margin-bottom:16px}
+h2{margin:0 0 16px;font-size:20px}.muted{color:#64748b;font-size:13px}
+label{display:block;font-size:13px;font-weight:bold;margin:10px 0 5px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d7dee7;border-radius:8px;font-size:14px}
+button{border:0;border-radius:8px;padding:11px 15px;font-weight:bold;cursor:pointer;background:#17202a;color:#fff}
+button.secondary{background:#e8edf2;color:#17202a}button.danger{background:#b42318}button.green{background:#16803c}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.result{background:#f8fafc;border-radius:12px;padding:16px;margin-top:16px;border:1px solid #e2e8f0}
+.result.good{border-left:5px solid #16803c}.result.warn{border-left:5px solid #c98200}.result.bad{border-left:5px solid #b42318}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px}
+.kpi{padding:16px;background:#fff;border-radius:12px;border:1px solid #e2e8f0}.kpi span{display:block;color:#64748b;font-size:13px}.kpi strong{font-size:23px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#f8fafc}
+.client-card{border:1px solid #e2e8f0;padding:14px;border-radius:10px;margin:10px 0}
+.badge{display:inline-block;padding:5px 8px;border-radius:20px;background:#eef2ff;color:#3730a3;font-size:12px}
+
+.insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px}
+.insight{padding:14px;border:1px solid #e6e6e6;border-radius:14px;background:#fff}
+.insight strong{display:block;font-size:20px;margin-top:4px}
+.insight.good{border-left:5px solid #16803c}
+.insight.warn{border-left:5px solid #c98200}
+.insight.bad{border-left:5px solid #b42318}
+
+
+.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:14px}
+.price-card{padding:16px;border:1px solid #e6e6e6;border-radius:14px;background:#fff}
+.price-card strong{display:block;font-size:24px;margin-top:5px}
+.price-card.primary{border:2px solid #16803c}
+.price-card.alert{border-left:5px solid #c98200}
+
+
+.profile-box{padding:16px;border:1px solid #e6e6e6;border-radius:14px;background:#fff;margin-top:14px}
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+
+
+.brain-alert{padding:12px 14px;border:1px solid #e2e8f0;border-radius:10px;margin:8px 0;background:#fff}.brain-alert.good{border-left:5px solid #16803c}.brain-alert.warn{border-left:5px solid #c98200}.brain-alert.bad{border-left:5px solid #b42318}.brain-score{font-size:30px;font-weight:bold}.brain-small{font-size:12px;color:#64748b}.trend-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.trend-card{padding:13px;border:1px solid #e2e8f0;border-radius:10px}.trend-card strong{display:block;font-size:20px;margin-top:4px}
+
+.metric{padding:16px;border:1px solid #e6e6e6;border-radius:14px;background:#fff}
+.metric span{display:block;font-size:13px;color:#666;margin-bottom:6px}
+.metric strong{font-size:22px}
+
+
+/* V16 — experiência assistida */
+.assist-home{max-width:920px;margin:0 auto 18px}
+.assist-hero{background:#17202a;color:#fff;border-radius:18px;padding:22px}
+.assist-hero h2{font-size:24px;margin:0 0 6px}.assist-hero p{color:#cbd5e1;margin:0 0 16px}
+.assist-command{display:flex;gap:8px;align-items:stretch}.assist-command textarea{min-height:56px;resize:none;border:0;flex:1;font-size:15px}.assist-command button{min-width:120px}
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.quick-actions button{background:#fff;color:#17202a;border:1px solid #d7dee7}
+.focus-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px}.focus-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px}.focus-card span{display:block;color:#64748b;font-size:12px}.focus-card strong{display:block;font-size:20px;margin:5px 0}.focus-card p{margin:0;font-size:13px;color:#475569}
+.focus-card.action{border-left:5px solid #16803c}.focus-card.warn{border-left:5px solid #c98200}.focus-card.bad{border-left:5px solid #b42318}
+.assist-response{margin-top:12px}.assist-response .result{margin-top:0}
+.more-tools{max-width:920px;margin:0 auto}.more-tools>summary{cursor:pointer;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;font-weight:bold;list-style:none}.more-tools>summary::-webkit-details-marker{display:none}.more-tools[open]>summary{border-radius:12px 12px 0 0}.tools-wrap{padding-top:12px}
+@media(max-width:680px){.assist-command{flex-direction:column}.quick-actions{grid-template-columns:repeat(2,1fr)}.assist-command button{width:100%}}
+
+</style>
+</head>
+<body>
+<header>
+<h1>Assistente Operacional</h1>
+<p>V16.8 — Rota Integrada — operação prática, inteligência e gestão</p>
+</header>
+
+
+<section class="assist-home">
+  <div class="assist-hero">
+    <h2>🧠 O que você precisa fazer?</h2>
+    <p>Fale normalmente. O Assistente entende, calcula e prepara a próxima ação.</p>
+    <div class="assist-command">
+      <textarea id="v16Command" rows="2" placeholder="Ex.: fiz um frete para Mart Minas de Contagem para Betim por R$ 4.500"></textarea>
+      <button class="green" onclick="v16HandleCommand()">Resolver</button>
+    </div>
+    <div class="quick-actions">
+      <button onclick="v16Quick('frete')">🚛 Novo frete</button>
+      <button onclick="v16Quick('receber')">💰 Ver recebimentos</button>
+      <button onclick="v16Quick('fechamento')">📄 Fechamento</button>
+      <button onclick="v16Quick('gestao')">📊 Como está a operação?</button>
+    </div>
+    <div id="v16Response" class="assist-response"></div>
+  </div>
+  <div class="focus-grid" id="v16Focus"></div>
+</section>
+
+<details class="more-tools">
+  <summary>⚙️ Mais ferramentas operacionais</summary>
+  <div class="tools-wrap">
+<main>
+<section class="card">
+<h2>🧠 Assistente Inteligente</h2>
+<p class="muted">Digite como você falaria com o Assistente. Ele identifica os dados e mostra o lançamento antes de salvar. Para horas extras, informe sempre a quantidade e o valor por hora. Manutenção é informada diretamente no frete. Ex.: 5 horas extras 22,00 = R$ 110,00.</p>
+<textarea id="smartText" rows="4" placeholder="Ex.: Frete para Mart Minas, Contagem para Betim, R$ 4.500, diesel R$ 350 e manutenção R$ 200."></textarea>
+<div class="actions"><button class="green" id="voiceBtn" type="button" onclick="toggleVoice()">🎙️ Falar</button><button onclick="interpretSmart()">Interpretar lançamento</button></div><div id="voiceStatus" class="muted" aria-live="polite">A voz será testada pelo microfone antes do reconhecimento.</div>
+<div id="smartResult"></div>
+</section>
+
+
+<section class="card">
+<h2>🚛 Veículos</h2>
+<div class="grid">
+<div><label>Nome do veículo</label><input id="vNome" placeholder="Caminhão 01"></div>
+<div><label>Placa</label><input id="vPlaca" placeholder="ABC1D23"></div>
+<div><label>Consumo (km/L)</label><input id="vConsumo" type="number" step="0.1" placeholder="2.8"></div>
+</div>
+<div class="actions"><button onclick="addVehicle()">Cadastrar veículo</button></div>
+<div id="vehicles"></div>
+</section>
+
+<section class="card">
+<h2>👤 Clientes</h2>
+<div class="grid">
+<div><label>Nome do cliente</label><input id="cNome" placeholder="Empresa ABC"></div>
+<div><label>Contato (opcional)</label><input id="cContato" placeholder="WhatsApp / telefone"></div><div><label>CNPJ (opcional)</label><input id="cCnpj" placeholder="00.000.000/0000-00"></div>
+</div>
+<div class="actions"><button onclick="addClient()">Cadastrar cliente</button></div>
+<div id="clients"></div>
+</section>
+
+<section class="card">
+<h2>🧠 Análise antes de aceitar o frete</h2>
+<div class="grid">
+<div><label>Cliente</label><select id="aCliente"></select></div>
+<div><label>Veículo</label><select id="aVeiculo" onchange="syncConsumption()"></select></div>
+<div><label>Valor do frete (R$)</label><input id="aFrete" type="number" step="0.01" placeholder="4500"></div>
+<div><label>Distância total (km)</label><input id="aKm" type="number" step="0.1" placeholder="120"></div>
+<div><label>Preço do diesel (R$/L)</label><input id="aDiesel" type="number" step="0.01" placeholder="6.20"></div>
+<div><label>Consumo usado (km/L)</label><input id="aConsumo" type="number" step="0.1" placeholder="Selecione o veículo"></div>
+<div><label>Pedágio (R$)</label><input id="aPedagio" type="number" step="0.01" placeholder="80"></div>
+<div><label>Terceirização / outros (R$)</label><input id="aTerceiro" type="number" step="0.01" placeholder="400"></div>
+<div><label>Margem mínima desejada (%)</label><input id="aMeta" type="number" step="0.1" value="30" min="0" max="99.9"></div>
+</div>
+<div class="actions"><button onclick="analyze()">Analisar frete</button></div>
+<div id="analysis"></div>
+<p class="muted">Regra inicial: 🟢 aceita quando atinge a margem mínima; 🟡 exige análise quando é lucrativo, mas abaixo da meta; 🔴 não recomendado quando a margem fica muito abaixo da meta ou há prejuízo.</p>
+</section>
+
+<section class="card">
+<h2>📝 Registrar serviço</h2>
+<div class="grid">
+<div><label>Data</label><input id="sData" type="date"></div>
+<div><label>Cliente</label><select id="sCliente"></select></div>
+<div><label>Veículo</label><select id="sVeiculo"></select></div>
+<div><label>Origem</label><input id="sOrigem" placeholder="Contagem"></div>
+<div><label>Destino</label><input id="sDestino" placeholder="Betim"></div>
+<div style="display:flex;align-items:end"><button type="button" class="secondary" onclick="openMapsFromFields()">🗺️ Abrir rota no Maps</button></div>
+<div><label>Valor do serviço (R$)</label><input id="sValor" type="number" step="0.01"></div>
+<div><label>Status</label><select id="sStatus"><option>Pendente</option><option>Recebido</option></select></div>
+<div><label>Combustível (R$)</label><input id="sComb" type="number" step="0.01" value="0"></div>
+<div><label>Pedágio (R$)</label><input id="sPed" type="number" step="0.01" value="0"></div>
+<div><label>Terceirização (R$)</label><input id="sTer" type="number" step="0.01" value="0"></div>
+<div><label>Alimentação (R$)</label><input id="sAlimentacao" type="number" step="0.01" value="0"></div>
+<div><label>Hotel / hospedagem (R$)</label><input id="sHotel" type="number" step="0.01" value="0"></div><div><label>Diárias do motorista (R$)</label><input id="sMotoristaDiarias" type="number" step="0.01" value="0"></div><div><label>Horas extras — quantidade</label><input id="sHorasExtrasQtd" type="number" step="0.01" min="0" value="0" oninput="updateHorasExtrasManual()"></div><div><label>Horas extras — valor por hora (R$)</label><input id="sHorasExtrasValorHora" type="number" step="0.01" min="0" value="0" oninput="updateHorasExtrasManual()"></div><div><label>Total horas extras (R$)</label><input id="sHorasExtras" type="number" step="0.01" value="0" readonly></div>
+<div><label>Manutenção do veículo (R$)</label><input id="sManutencao" type="number" step="0.01" value="0"></div>
+<div><label>Outros custos (R$)</label><input id="sOutros" type="number" step="0.01" value="0"></div>
+</div>
+<div class="actions"><button onclick="addService()">Adicionar serviço</button></div>
+</section>
+
+<section class="card">
+<h2>📈 Painel Geral</h2>
+<div class="grid">
+<div><label>Período</label><select id="dPeriodo" onchange="renderDashboard()"><option value="mes">Este mês</option><option value="hoje">Hoje</option><option value="todos">Todos os dados</option></select></div>
+</div>
+<div class="kpis" id="dashboardKpis"></div>
+<div class="grid" style="margin-top:16px">
+ <div class="result"><h3>🏆 Clientes que mais faturam</h3><div id="topClients"></div></div>
+ <div class="result"><h3>💸 Custos por categoria</h3><div id="costBreakdown"></div></div>
+</div>
+</section>
+
+<section class="card">
+<h2>📊 Serviços por cliente</h2>
+<div id="services"></div>
+<div class="actions">
+<button onclick="exportCSV()">Exportar CSV</button>
+<button class="danger" onclick="clearAll()">Limpar dados</button>
+</div>
+</section>
+
+
+<section class="card">
+  <h2>🧠 Inteligência dos seus fretes</h2>
+  <p class="muted">O sistema compara os fretes registrados e mostra o seu padrão real de operação.</p>
+  <div id="historyInsights"></div>
+</section>
+
+
+<section class="card">
+  <h2>💰 Quanto cobrar?</h2>
+  <p class="muted">Informe os mesmos dados da análise do frete e o sistema calcula um preço mínimo e uma faixa recomendada para atingir sua margem.</p>
+  <div class="grid">
+    <div><label>Margem desejada (%)</label><input id="pMeta" type="number" step="0.1" value="30" min="1" max="99"></div>
+    <div><label>Margem ideal (%)</label><input id="pIdeal" type="number" step="0.1" value="35" min="1" max="99"></div>
+    <div><label>Distância total (KM)</label><input id="pKm" type="number" step="0.1" placeholder="120"></div>
+    <div><label>Consumo (KM/L)</label><input id="pConsumo" type="number" step="0.1" placeholder="2.8"></div>
+    <div><label>Preço do diesel (R$/L)</label><input id="pDiesel" type="number" step="0.01" placeholder="6.20"></div>
+    <div><label>Pedágio (R$)</label><input id="pPedagio" type="number" step="0.01" placeholder="80"></div>
+    <div><label>Terceirização / outros (R$)</label><input id="pTerceiro" type="number" step="0.01" placeholder="400"></div>
+  </div>
+  <div class="actions"><button class="green" onclick="recommendPrice()">Calcular preço recomendado</button></div>
+  <div id="priceRecommendation"></div>
+</section>
+
+
+<section class="card" id="compararClientes">
+  <h2>📊 Comparar clientes</h2>
+  <p class="muted">Compare seus clientes por faturamento, custos, lucro, margem e quantidade de serviços para identificar quem traz mais retorno.</p>
+  <div class="grid">
+    <div><label>De</label><input id="cmpDataDe" type="date" onchange="compareClients()"></div>
+    <div><label>Até</label><input id="cmpDataAte" type="date" onchange="compareClients()"></div>
+  </div>
+  <div class="actions">
+    <button class="green" onclick="compareClients()">Comparar clientes</button>
+  </div>
+  <div id="clientComparison"></div>
+</section>
+
+
+<section class="card" id="cerebroOperacional">
+  <h2>🧠 Cérebro Operacional</h2>
+  <p class="muted">O sistema transforma os dados da operação em uma leitura executiva: desempenho, riscos e próximas ações.</p>
+  <div class="kpis" id="brainKpis"></div>
+  <div class="profile-grid" style="margin-top:16px">
+    <div class="profile-box"><b>🎯 Diagnóstico</b><p id="brainDiagnosis">Analisando seus dados...</p></div>
+    <div class="profile-box"><b>⚠️ Principal risco</b><p id="brainRisk">—</p></div>
+    <div class="profile-box"><b>💡 Oportunidade</b><p id="brainOpportunity">—</p></div>
+    <div class="profile-box"><b>➡️ Próxima ação</b><p id="brainAction">—</p></div>
+  </div>
+  <div class="result" style="margin-top:16px">
+    <h3 style="margin-top:0">📌 Alertas da operação</h3>
+    <div id="brainAlerts"></div>
+  </div>
+  <div class="result" style="margin-top:16px">
+    <h3 style="margin-top:0">📈 Comparativo recente</h3>
+    <div id="brainTrend"></div>
+  </div>
+  <div class="actions">
+    <button class="green" onclick="updateOperationalBrain(true)">🔄 Atualizar análise</button>
+  </div>
+</section>
+
+<section class="card" id="painelGestao">
+  <h2>📊 Painel de Gestão</h2>
+  <p class="muted">Uma visão rápida de onde a operação está ganhando dinheiro e onde precisa de atenção.</p>
+  <div class="grid">
+    <div class="metric"><span>Faturamento</span><strong id="dashFat">R$ 0,00</strong></div>
+    <div class="metric"><span>Custos</span><strong id="dashCost">R$ 0,00</strong></div>
+    <div class="metric"><span>Lucro</span><strong id="dashProfit">R$ 0,00</strong></div>
+    <div class="metric"><span>Margem</span><strong id="dashMargin">0,0%</strong></div>
+    <div class="metric"><span>Fretes</span><strong id="dashCount">0</strong></div>
+    <div class="metric"><span>A receber</span><strong id="dashReceivable">R$ 0,00</strong></div>
+  </div>
+  <div class="profile-grid" style="margin-top:16px">
+    <div class="profile-box"><b>🏆 Cliente mais rentável</b><p id="dashTopClient">—</p></div>
+    <div class="profile-box"><b>🚛 Veículo mais rentável</b><p id="dashTopVehicle">—</p></div>
+    <div class="profile-box"><b>🗺️ Rota mais rentável</b><p id="dashTopRoute">—</p></div>
+    <div class="profile-box"><b>⚠️ Atenção</b><p id="dashAlert">Sem dados suficientes.</p></div>
+  </div>
+</section>
+
+<section class="card">
+<h2>💰 Financeiro</h2>
+<div class="grid">
+<div><label>Cliente</label><select id="fCliente" onchange="renderFinance(); renderReceivables()"></select></div>
+<div><label>De</label><input id="fDe" type="date" onchange="renderFinance()"></div>
+<div><label>Até</label><input id="fAte" type="date" onchange="renderFinance()"></div>
+</div>
+<div class="kpis" id="finance"></div>
+</section>
+<section class="card" id="contasReceber"><h2>💰 Contas a Receber — Fechamento</h2><p class="muted">Transforme os serviços já registrados em um fechamento profissional, rastreável e pronto para enviar ao cliente.</p><div class="grid"><div><label>Cliente</label><select id="crCliente" onchange="renderReceivables()"></select></div><div><label>De</label><input id="crDe" type="date" onchange="renderReceivables()"></div><div><label>Até</label><input id="crAte" type="date" onchange="renderReceivables()"></div><div><label>Status</label><select id="crStatus" onchange="renderReceivables()"><option value="">Todos</option><option>Salvo</option><option>Enviado</option><option>Recebido</option></select></div></div><div class="kpis" id="receivableKpis"></div><div class="actions"><button class="green" onclick="createClosure()">📄 Gerar fechamento</button></div><div id="receivablePreview"></div><div id="closuresHistory" style="margin-top:16px"></div></section>
+</main>
+
+<script>
+const KEY='assistente_operacional_v5';
+let db=JSON.parse(localStorage.getItem(KEY)||'{"vehicles":[],"clients":[],"services":[],"closures":[]}');
+if(!Array.isArray(db.closures)) db.closures=[];
+
+function save(){localStorage.setItem(KEY,JSON.stringify(db));renderAll()}
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+
+
+function brNum(v){
+  const raw=String(v??'').trim().replace(/\s/g,'');
+  if(!raw) return 0;
+  // Mantém exatamente o número informado: 109 continua 109.
+  // Brasil: 1.234,56 | 1234,56 | 1234.56 | 1234.
+  const cleaned=raw.replace(/R\$/ig,'').replace(/[.,]+$/,'');
+  if(cleaned.includes(',') && cleaned.includes('.')) return Number(cleaned.replace(/\./g,'').replace(',','.'))||0;
+  if(cleaned.includes(',')) return Number(cleaned.replace(',','.'))||0;
+  if(cleaned.includes('.')){
+    const parts=cleaned.split('.');
+    if(parts.length===2 && parts[1].length===3) return Number(parts[0]+parts[1])||0;
+  }
+  return Number(cleaned)||0;
+}
+function numberWordsBR(v){
+  const t=normalizeText(v);
+  const map={zero:0,um:1,uma:1,dois:2,duas:2,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12,treze:13,quatorze:14,quinze:15,dezesseis:16,dezessete:17,dezoito:18,dezenove:19,vinte:20,trinta:30,quarenta:40,cinquenta:50,sessenta:60,setenta:70,oitenta:80,noventa:90,cem:100,cento:100,duzentos:200,duzentas:200,trezentos:300,trezentas:300,quatrocentos:400,quinhentos:500,seiscentos:600,setecentos:700,oitocentos:800,novecentos:900};
+  if(Object.prototype.hasOwnProperty.call(map,t)) return map[t];
+  const parts=t.split(/\s+e\s+/);
+  if(parts.length===2 && map[parts[0]]!=null && map[parts[1]]!=null) return map[parts[0]]+map[parts[1]];
+  return null;
+}
+function parseMoney(text, patterns){
+  for(const re of patterns){const m=text.match(re);if(m)return brNum(m[1])}
+  return 0;
+}
+function findClientInText(text){
+ const low=normalizeText(text);
+ return db.clients.find(c=>{
+   const nome=normalizeText(c.nome);
+   return nome && low.includes(nome);
+ })||null;
+}
+function normalizeText(v){
+ return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
+   .replace(/[^a-z0-9]+/g,' ').trim();
+}
+function findVehicleInText(text){
+ const low=normalizeText(text);
+ return db.vehicles.find(v=>{
+   const nome=normalizeText(v.nome);
+   const placa=normalizeText(v.placa);
+   return (nome && low.includes(nome)) || (placa && low.includes(placa));
+ })||null;
+}
+function parseCost(text, labels){
+  // Parser determinístico de custos. O valor deve ficar semanticamente
+  // ligado ao rótulo, inclusive em frases naturais como "109 da alimentação".
+  const cleanLabels=labels.flatMap(x=>String(x).split('|')).filter(Boolean);
+  const escRe=x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const label=cleanLabels.map(escRe).join('|');
+  const number=String.raw`([0-9]+(?:[.,][0-9]{1,2})?)`;
+  const patterns=[
+    // alimentação 109 | alimentação R$ 109 | alimentação: 109
+    new RegExp(String.raw`(?:${label})\s*(?:(?:de|do|da|com|em|para|no valor de|por)\s*)?r?\$?\s*${number}(?![0-9])`,'i'),
+    // 109 da alimentação | R$ 109 de alimentação
+    new RegExp(String.raw`r?\$?\s*${number}(?![0-9])\s*(?:(?:de|do|da|com|em|para)\s*)?(?:${label})(?=\s|,|;|\.|$)`,'i'),
+    new RegExp(String.raw`(?:${label})\s*[:=-]\s*r?\$?\s*${number}(?![0-9])`,'i')
+  ];
+  return parseMoney(text,patterns);
+}
+function parseDriverCosts(text){
+ const low=normalizeText(text);
+ const words={um:1,uma:1,dois:2,duas:2,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10};
+ let dailyCount=0;
+ let m=low.match(/\b(\d+(?:[.,]\d+)?)\s+diarias?\b/i);
+ if(m) dailyCount=brNum(m[1]);
+ if(!dailyCount){m=low.match(/\b(um|uma|dois|duas|tres|quatro|cinco|seis|sete|oito|nove|dez)\s+diarias?\b/i);if(m)dailyCount=words[m[1]]||0;}
+ if(!dailyCount && /\bdiarias?\b/i.test(low)) dailyCount=1;
+
+ // Formas aceitas:
+ // "2 diárias de 60", "2 diárias 60", "60 de diária", "diária de 60".
+ let dailyUnit=0;
+ const after=low.match(/\bdiarias?\b\s*(?:de|a|por|no valor de|:)?\s*r?\$?\s*([0-9][0-9.,]*)/i);
+ if(after) dailyUnit=brNum(after[1]);
+ if(!dailyUnit){
+   const before=low.match(/r?\$?\s*([0-9][0-9.,]*)\s+(?:de\s+)?diarias?\b/i);
+   if(before) dailyUnit=brNum(before[1]);
+ }
+ // Caso comum "2 diárias 60": o primeiro número é quantidade, o segundo é valor.
+ if(dailyCount && !dailyUnit){
+   const qtyValue=low.match(/\b(?:\d+(?:[.,]\d+)?|um|uma|dois|duas|tres|quatro|cinco|seis|sete|oito|nove|dez)\s+diarias?\s+(?:de\s+|a\s+|por\s+|r?\$?\s*)?([0-9][0-9.,]*)\b/i);
+   if(qtyValue) dailyUnit=brNum(qtyValue[1]);
+ }
+
+ const hm=low.match(/\b(\d+(?:[.,]\d+)?)\s*horas?\s*(?:extras?|extra)\b/i);
+ const extraHours=hm?brNum(hm[1]):0;
+ // Regra: hora extra só é calculada quando o usuário informa explicitamente
+ // a quantidade de horas E o valor de cada hora. Ex.: "5 horas extras 22,00".
+ let explicitRate=0;
+ const er=low.match(/\b\d+(?:[.,]\d+)?\s*horas?\s*(?:extras?|extra)\s*(?:(?:a|de|por|no\s+valor\s+de)\s*|:\s*)?r?\$?\s*([0-9][0-9.,]*)/i);
+ if(er) explicitRate=brNum(er[1]);
+ const extraRate=explicitRate;
+ const extraTotal=extraHours>0&&extraRate>0?extraHours*extraRate:0;
+ const extraMissing=extraHours>0&&extraRate<=0;
+ return {dailyCount,dailyUnit,dailyTotal:dailyCount*dailyUnit,extraHours,extraRate,extraTotal,estimated:false,extraMissing};
+}
+function openMapsRoute(origin,destination){
+  const o=String(origin||'').trim(), d=String(destination||'').trim();
+  if(!o||!d){alert('Informe origem e destino para abrir a rota.');return;}
+  const url='https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(o)+'&destination='+encodeURIComponent(d);
+  window.open(url,'_blank','noopener');
+}
+function openMapsFromFields(){
+  const o=document.getElementById('sOrigem')?.value||'', d=document.getElementById('sDestino')?.value||'';
+  openMapsRoute(o,d);
+}
+
+let voiceRecognition=null;
+let voiceListening=false;
+let voicePermissionStream=null;
+function voiceSupported(){return !!(window.SpeechRecognition||window.webkitSpeechRecognition);}
+function setVoiceStatus(msg){const e=document.getElementById('voiceStatus');if(e)e.textContent=msg||'';}
+async function requestMicrophonePermission(){
+  if(!navigator.mediaDevices?.getUserMedia) return true;
+  try{
+    voicePermissionStream=await navigator.mediaDevices.getUserMedia({audio:true});
+    voicePermissionStream.getTracks().forEach(t=>t.stop());
+    voicePermissionStream=null;
+    return true;
+  }catch(err){
+    const map={NotAllowedError:'Permissão do microfone bloqueada. Autorize o microfone para este site.',NotFoundError:'Nenhum microfone foi encontrado.',NotReadableError:'O microfone está ocupado ou indisponível.',SecurityError:'O navegador bloqueou o microfone por segurança.'};
+    setVoiceStatus('⚠️ '+(map[err?.name]||'Não foi possível acessar o microfone.'));
+    return false;
+  }
+}
+async function toggleVoice(){
+  const Btn=document.getElementById('voiceBtn');
+  if(voiceListening && voiceRecognition){try{voiceRecognition.stop()}catch(e){}return;}
+  if(!window.isSecureContext && location.hostname!=='localhost'){
+    setVoiceStatus('⚠️ Voz exige conexão segura HTTPS quando publicada. Abra o sistema pelo endereço HTTPS.');
+    return;
+  }
+  const permitted=await requestMicrophonePermission();
+  if(!permitted)return;
+  if(!voiceSupported()){
+    setVoiceStatus('⚠️ Este navegador não oferece SpeechRecognition. No iPhone/iPad, use o ditado do teclado por enquanto; no app oficial usaremos uma camada de transcrição própria.');
+    document.getElementById('smartText')?.focus();
+    return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  try{
+    voiceRecognition=new SR();
+    voiceRecognition.lang='pt-BR';
+    voiceRecognition.continuous=false;
+    voiceRecognition.interimResults=true;
+    voiceRecognition.maxAlternatives=3;
+    // Usa reconhecimento local quando o navegador oferecer essa capacidade.
+    if('processLocally' in voiceRecognition) voiceRecognition.processLocally=false;
+    voiceListening=true;
+    if(Btn){Btn.textContent='⏹️ Parar';Btn.disabled=false;}
+    setVoiceStatus('🎙️ Microfone autorizado. Ouvindo... fale o lançamento completo.');
+    voiceRecognition.onstart=()=>setVoiceStatus('🎙️ Ouvindo...');
+    voiceRecognition.onaudiostart=()=>setVoiceStatus('🎙️ Áudio recebido. Fale normalmente.');
+    voiceRecognition.onspeechstart=()=>setVoiceStatus('🎙️ Voz detectada...');
+    voiceRecognition.onresult=e=>{
+      let text='';
+      for(let i=e.resultIndex;i<e.results.length;i++) text+=e.results[i][0].transcript+' ';
+      const field=document.getElementById('smartText');
+      if(field)field.value=text.trim();
+      if(e.results[e.results.length-1].isFinal){
+        setVoiceStatus('✅ Voz convertida. Conferindo dados...');
+        interpretSmart();
+      }
+    };
+    voiceRecognition.onerror=e=>{
+      const map={'not-allowed':'Permissão do microfone bloqueada.','service-not-allowed':'O serviço de reconhecimento foi bloqueado.','no-speech':'Não ouvi sua fala.','audio-capture':'Não encontrei um microfone disponível.','network':'O serviço de reconhecimento não respondeu.','language-not-supported':'Português do Brasil não está disponível neste navegador.'};
+      setVoiceStatus('⚠️ '+(map[e.error]||('Falha no reconhecimento ('+e.error+').')));
+    };
+    voiceRecognition.onend=()=>{voiceListening=false;if(Btn)Btn.textContent='🎙️ Falar';};
+    voiceRecognition.start();
+  }catch(e){
+    voiceListening=false;if(Btn)Btn.textContent='🎙️ Falar';
+    setVoiceStatus('⚠️ Não foi possível iniciar o reconhecimento neste navegador.');
+  }
+}
+
+function interpretSmart(){
+ try{
+ const text=smartText.value.trim();
+ if(!text){alert('Digite ou cole o que aconteceu.');return}
+ const client=findClientInText(text);
+ const clientMention=text.match(/\bfrete\s+para\s+([^,;]+?)(?=\s*,|\s+de\s+|\s+saindo\s+de\s+|\s+contagem\s+para\s+|\s+para\s+|\s+r?\$|$)/i);
+ const clientNameFallback=client?.nome || (clientMention?clientMention[1].trim():'');
+ const vehicle=findVehicleInText(text);
+ const value=parseMoney(text,[/(?:frete|faturamento)\s*(?:de|no\s+valor\s+de|por)\s*r?\$?\s*([\d.,]+)/i,/(?:por|valor(?: de)?)\s*r?\$?\s*([\d.,]+)/i,/(?:frete|faturamento)[^0-9]{0,40}r?\$?\s*([\d.,]+)/i]);
+ const fuel=parseCost(text,['diesel','combustivel','combustível']);
+ const toll=parseCost(text,['pedagio','pedágio','depedagio','depedágio']);
+ const food=parseCost(text,['alimentacao','alimentação','refeicao','refeição']);
+ const hotel=parseCost(text,['hotel','hospedagem']);
+ const third=parseCost(text,['terceiro','terceirizado','terceirizacao','terceirização','frete terceirizado']);
+ const driver=parseDriverCosts(text);
+ const kmMatch=text.match(/([0-9]+(?:[.,][0-9]+)?)\s*(?:km|quil[oô]metros?)/i);
+ const route=(text.match(/\b(?:de|saindo de)\s+([A-Za-zÀ-ÿ0-9 ._-]+?)\s+(?:para|até|ate)\s+([A-Za-zÀ-ÿ0-9 ._-]+?)(?=\s+(?:r?\$?\s*)?\d|\s+(?:por|no\s+valor|com|e)\b|\s*(?:,|;|$))/i) || text.match(/[,;]\s*([A-Za-zÀ-ÿ0-9 ._-]+?)\s+(?:para|até|ate)\s+([A-Za-zÀ-ÿ0-9 ._-]+?)(?=\s+(?:r?\$?\s*)?\d|\s+(?:por|no\s+valor|com|e)\b|\s*(?:,|;|$))/i));
+ const date=text.match(/(?:hoje|amanh[aã]|ontem)/i)?.[0]?.toLowerCase()||'hoje';
+ const km=kmMatch?brNum(kmMatch[1]):0;
+ const maintenanceExplicit=parseCost(text,['manutencao do veiculo','manutenção do veículo','manutencao','manutenção','oficina','reparo','revisao','revisão']);
+ const maintenance=maintenanceExplicit>0?maintenanceExplicit:0;
+ let combust=fuel;
+ if(!fuel && km && vehicle){
+   const dieselPrice=parseMoney(text,[/(?:diesel|litro)\s*(?:a|por|de|:)?\s*r?\$?\s*([\d.,]+)/i]);
+   if(dieselPrice && vehicle.consumo) combust=km/vehicle.consumo*dieselPrice;
+ }
+ const costs=combust+toll+food+hotel+maintenance+third+driver.dailyTotal+driver.extraTotal;
+ const profit=value-costs;
+ const margin=value?profit/value*100:0;
+ const missing=[];
+ if(driver.extraMissing) missing.push('valor de cada hora extra');
+ if(!client)missing.push(clientNameFallback?`cadastre o cliente "${clientNameFallback}"`:'cliente');
+ if(!value)missing.push('valor do frete');
+ if(!route)missing.push('origem e destino');
+ const displayDate=date==='ontem'?'Ontem':date==='amanhã'?'Amanhã':'Hoje';
+ smartResult.innerHTML=`<div class="result ${missing.length?'warn':'good'}">
+ <b>${missing.length?'⚠️ Faltam informações':'✅ Entendi o lançamento'}</b>
+ <div class="kpis">
+ <div class="kpi"><span>Cliente</span><strong>${esc(clientNameFallback||'Não identificado')}</strong></div>
+ <div class="kpi"><span>Frete</span><strong>${money(value)}</strong></div>
+ <div class="kpi"><span>Custos</span><strong>${money(costs)}</strong></div>
+ <div class="kpi"><span>Lucro</span><strong>${money(profit)}</strong></div>
+ </div>
+ <p><b>Data:</b> ${displayDate}<br><b>Rota:</b> ${route?esc(route[1].trim())+' → '+esc(route[2].trim()):'Não identificada'} ${route?`<button class="secondary" style="padding:6px 9px;margin-left:6px" onclick="openMapsRoute(${JSON.stringify(route[1].trim())},${JSON.stringify(route[2].trim())})">🗺️ Maps</button>`:''}<br><b>Veículo:</b> ${esc(vehicle?.nome||'Não identificado')} ${vehicle?`• Placa: ${esc(vehicle.placa||'—')} • ${vehicle.consumo.toFixed(1)} km/L`:''}<br><b>Combustível:</b> ${money(combust)} • <b>Pedágio:</b> ${money(toll)} • <b>Alimentação:</b> ${money(food)} • <b>Hotel:</b> ${money(hotel)} • <b>Manutenção:</b> ${money(maintenance)} • <b>Diárias motorista:</b> ${money(driver.dailyTotal)} • <b>Horas extras:</b> ${money(driver.extraTotal)} • <b>Terceirização:</b> ${money(third)}<br>${driver.dailyCount?`<b>Motorista:</b> ${driver.dailyCount} diária(s) × ${money(driver.dailyUnit)} = ${money(driver.dailyTotal)}. `:''}${driver.extraHours?`<b>Horas extras:</b> ${driver.extraHours}h × ${money(driver.extraRate)}/h = ${money(driver.extraTotal)}${driver.estimated?' (estimado)':''}.`:''}<br><b>Margem:</b> ${value?margin.toFixed(1)+'%':'—'}${km?` • <b>KM:</b> ${km}`:''}</p>
+ ${missing.length?`<p class="muted">Precisamos de: <b>${missing.join(', ')}</b>.</p>`:`<div class="actions"><button class="green" onclick='confirmSmart(${JSON.stringify({clientId:client.id,value,combust,toll,food,hotel,third,driverDailyCount:driver.dailyCount,driverDailyUnit:driver.dailyUnit,driverDailyTotal:driver.dailyTotal,driverExtraHours:driver.extraHours,driverExtraRate:driver.extraRate,driverExtraTotal:driver.extraTotal,maintenance,route:route?[route[1].trim(),route[2].trim()]:['',''],km,vehicleId:vehicle?.id||null})})'>Confirmar e registrar</button><button class="secondary" onclick="smartText.focus()">Corrigir texto</button></div>`}
+ </div>`;
+ }catch(err){ console.error(err); smartResult.innerHTML=`<div class="result bad"><b>⚠️ Não consegui interpretar esse lançamento.</b><p>Revise os valores e tente novamente.</p></div>`; }
+}
+function confirmSmart(d){
+ const today=new Date().toISOString().slice(0,10);
+ db.services.push({id:Date.now(),date:today,clientId:d.clientId,origem:d.route[0],destino:d.route[1],valor:d.value,status:'Pendente',comb:Number(d.combust.toFixed(2)),ped:d.toll,ter:d.third,alimentacao:d.food,hotel:d.hotel||0,motoristaDiarias:Number(d.driverDailyTotal)||0,motoristaDiariasQtd:Number(d.driverDailyCount)||0,motoristaDiariaValor:Number(d.driverDailyUnit)||0,horasExtras:Number(d.driverExtraTotal)||0,horasExtrasQtd:Number(d.driverExtraHours)||0,horasExtrasValorHora:Number(d.driverExtraRate)||0,manutencao:Number(d.maintenance)||0,outros:0,vehicleId:d.vehicleId,km:d.km});
+ save(); smartText.value=''; smartResult.innerHTML='<div class="result good"><b>✅ Frete registrado com sucesso.</b></div>';
+}
+function addVehicle(){
+ const nome=vNome.value.trim(), placa=vPlaca.value.trim(), consumo=Number(vConsumo.value);
+ if(!nome||!consumo){alert('Informe nome e consumo do veículo.');return}
+ db.vehicles.push({id:Date.now(),nome,placa,consumo});vNome.value='';vPlaca.value='';vConsumo.value='';save()
+}
+function addClient(){
+ const nome=cNome.value.trim();if(!nome){alert('Informe o nome do cliente.');return}
+ db.clients.push({id:Date.now(),nome,contato:cContato.value.trim(),cnpj:cCnpj.value.trim()});cNome.value='';cContato.value='';cCnpj.value='';save()
+}
+function syncConsumption(){
+ const v=db.vehicles.find(x=>x.id==aVeiculo.value);aConsumo.value=v?v.consumo:''
+}
+function analyze(){
+ const frete=Number(aFrete.value)||0, km=Number(aKm.value)||0, diesel=Number(aDiesel.value)||0, cons=Number(aConsumo.value)||0;
+ const ped=Number(aPedagio.value)||0, ter=Number(aTerceiro.value)||0, meta=(Number(aMeta.value)||30)/100;
+ const vehicle=db.vehicles.find(v=>v.id==aVeiculo.value);
+ const manutKm=0;
+ if(!frete||!km||!diesel||!cons){alert('Informe frete, distância, diesel e consumo.');return}
+ const combust=km/cons*diesel;
+ const manut=manutKm*km;
+ const total=combust+ped+ter+manut;
+ const lucro=frete-total;
+ const margem=frete?lucro/frete*100:0;
+ const custoKm=km?total/km:0;
+ const lucroKm=km?lucro/km:0;
+ const receitaKm=km?frete/km:0;
+ const minimo=meta<1?total/(1-meta):total;
+ let decisao, classe, icone, explicacao;
+ if(lucro<=0 || margem<Math.max(0,meta*100-10)){
+   decisao='NÃO RECOMENDADO'; classe='bad'; icone='🔴';
+   explicacao='A margem está abaixo de uma faixa segura para o negócio.';
+ }else if(margem<meta*100){
+   decisao='ANALISAR'; classe='warn'; icone='🟡';
+   explicacao='O frete é lucrativo, mas está abaixo da margem mínima definida.';
+ }else{
+   decisao='ACEITAR'; classe='good'; icone='🟢';
+   explicacao='O frete atende à margem mínima definida.';
+ }
+ analysis.innerHTML=`<div class="result ${classe}">
+ <b>${icone} FRETE ${decisao}</b>
+ <p class="muted">${explicacao}</p>
+ <div class="kpis">
+ <div class="kpi"><span>Combustível estimado</span><strong>${money(combust)}</strong></div>
+ <div class="kpi"><span>Manutenção estimada</span><strong>${money(manut)}</strong></div>
+ <div class="kpi"><span>Custo total</span><strong>${money(total)}</strong></div>
+ <div class="kpi"><span>Lucro estimado</span><strong>${money(lucro)}</strong></div>
+ <div class="kpi"><span>Margem</span><strong>${margem.toFixed(1)}%</strong></div>
+ <div class="kpi"><span>Custo por km</span><strong>${money(custoKm)}</strong></div>
+ <div class="kpi"><span>Lucro por km</span><strong>${money(lucroKm)}</strong></div>
+ </div>
+ <p><b>Receita/km:</b> ${money(receitaKm)} • <b>Frete mínimo para ${ (meta*100).toFixed(0)}% de margem:</b> ${money(minimo)}</p>
+ <p class="muted">Veículo: ${esc(vehicle?.nome||'—')} ${vehicle?`• Placa: ${esc(vehicle.placa||'—')} • ${cons.toFixed(1)} km/L`:''}</p>
+ <div class="actions"><button class="green" onclick="prepareRegisterFromAnalysis()">Usar análise para registrar</button></div>
+ </div>`;
+ window.lastAnalysis={frete,km,diesel,cons,ped,ter,manut,vehicleId:vehicle?.id||null};
+}
+function prepareRegisterFromAnalysis(){
+ const a=window.lastAnalysis;
+ if(!a){alert('Faça uma análise primeiro.');return}
+ sCliente.value=aCliente.value||'';
+ sVeiculo.value=a.vehicleId||'';
+ sValor.value=a.frete;
+ sComb.value=(a.km/a.cons*a.diesel).toFixed(2);
+ sPed.value=a.ped;
+ sTer.value=a.ter;
+ if(document.getElementById('sAlimentacao')) document.getElementById('sAlimentacao').value=0;
+ if(document.getElementById('sHotel')) document.getElementById('sHotel').value=0;
+ if(document.getElementById('sManutencao')) document.getElementById('sManutencao').value=0;
+ sOutros.value=0;
+ alert('Dados da análise enviados para "Registrar serviço". Preencha origem e destino e clique em "Adicionar serviço".');
+}
+function registerAnalyzedFreight(){
+ const clientId=Number(aCliente.value);
+ const vehicle=db.vehicles.find(v=>v.id==aVeiculo.value);
+ const frete=Number(aFrete.value), km=Number(aKm.value), diesel=Number(aDiesel.value), cons=Number(aConsumo.value);
+ const ped=Number(aPedagio.value)||0, ter=Number(aTerceiro.value)||0;
+ if(!clientId){alert('Selecione o cliente antes de registrar o frete.');return}
+ if(!vehicle||!frete||!km||!diesel||!cons){alert('Faça uma análise válida antes de registrar.');return}
+ const combust=km/cons*diesel;
+ const hoje=new Date().toISOString().slice(0,10);
+ const origem=prompt('Origem do frete:','');
+ if(origem===null)return;
+ const destino=prompt('Destino do frete:','');
+ if(destino===null)return;
+ db.services.push({
+   id:Date.now(),date:hoje,clientId,origem:origem.trim(),destino:destino.trim(),
+   valor:frete,status:'Pendente',comb:Number(combust.toFixed(2)),ped,ter,outros:0,
+   vehicleId:vehicle.id,km,diesel,consumo:cons
+ });
+ save();
+ sData.value=hoje;sCliente.value=clientId;sOrigem.value=origem.trim();sDestino.value=destino.trim();
+ sValor.value=frete;sStatus.value='Pendente';sComb.value=combust.toFixed(2);sPed.value=ped;sTer.value=ter;sOutros.value=0;
+ alert('Frete registrado com os dados da análise.');
+}
+function updateHorasExtrasManual(){
+ const q=Number(document.getElementById('sHorasExtrasQtd')?.value)||0;
+ const rate=Number(document.getElementById('sHorasExtrasValorHora')?.value)||0;
+ const total=document.getElementById('sHorasExtras');
+ if(total) total.value=(q*rate).toFixed(2);
+}
+function addService(){
+ const cliente=sCliente.value; if(!cliente){alert('Cadastre/selecione um cliente.');return}
+ const valor=Number(sValor.value);if(!valor){alert('Informe o valor do serviço.');return}
+ db.services.push({id:Date.now(),date:sData.value||new Date().toISOString().slice(0,10),clientId:Number(cliente),vehicleId:sVeiculo.value?Number(sVeiculo.value):null,origem:sOrigem.value,destino:sDestino.value,valor,status:sStatus.value,comb:Number(sComb.value)||0,ped:Number(sPed.value)||0,ter:Number(sTer.value)||0,alimentacao:Number(document.getElementById('sAlimentacao')?.value)||0,hotel:Number(document.getElementById('sHotel')?.value)||0,motoristaDiarias:Number(document.getElementById('sMotoristaDiarias')?.value)||0,horasExtras:Number(document.getElementById('sHorasExtras')?.value)||0,horasExtrasQtd:Number(document.getElementById('sHorasExtrasQtd')?.value)||0,horasExtrasValorHora:Number(document.getElementById('sHorasExtrasValorHora')?.value)||0,manutencao:Number(document.getElementById('sManutencao')?.value)||0,outros:Number(sOutros.value)||0});save()
+}
+function serviceCostValue(s){return Number(s.custos)||((Number(s.comb)||0)+(Number(s.ped)||0)+(Number(s.ter)||0)+(Number(s.alimentacao)||0)+(Number(s.hotel)||Number(s.hospedagem)||0)+(Number(s.motoristaDiarias)||0)+(Number(s.horasExtras)||0)+(Number(s.manutencao)||0)+(Number(s.outros)||0));}
+function clientName(id){return db.clients.find(c=>c.id==id)?.nome||'Cliente não informado'}
+function renderServices(){
+ if(!db.services.length){services.innerHTML='<p class="muted">Nenhum serviço registrado.</p>';return}
+ const grouped={};db.services.forEach(s=>(grouped[s.clientId]??=[]).push(s));
+ services.innerHTML=Object.entries(grouped).map(([cid,arr])=>{
+   const fat=arr.reduce((a,s)=>a+s.valor,0),cost=arr.reduce((a,s)=>a+serviceCostValue(s),0);
+   return `<div class="client-card"><h3>${esc(clientName(cid))} <span class="badge">${arr.length} serviço(s)</span></h3>
+   <p>Faturamento: <b>${money(fat)}</b> • Custos: <b>${money(cost)}</b> • Lucro: <b>${money(fat-cost)}</b></p>
+   <table><tr><th>Data</th><th>Rota</th><th>Valor</th><th>Custos</th><th>Status</th><th>Ação</th></tr>
+   ${arr.map(s=>`<tr><td>${esc(s.date)}</td><td>${esc(s.origem)} → ${esc(s.destino)}</td><td>${money(s.valor)}</td><td>${money(serviceCostValue(s))}</td><td>${esc(s.status)}</td><td><div class="actions" style="margin-top:0">${s.status!=='Recebido'?`<button class="green" style="padding:7px 10px" onclick="markReceived(${s.id})">Marcar recebido</button>`:''}<button class="secondary" style="padding:7px 10px" onclick="clearService(${s.id})">Limpar</button></div></td></tr>`).join('')}</table></div>`
+ }).join('')
+}
+function dashboardServices(){
+ const now=new Date(), today=now.toISOString().slice(0,10);
+ let de='',ate=today;
+ if(dPeriodo.value==='mes') de=new Date(now.getFullYear(),now.getMonth(),1).toISOString().slice(0,10);
+ if(dPeriodo.value==='hoje') de=today;
+ return db.services.filter(s=>(!de||s.date>=de)&&(!ate||s.date<=ate));
+}
+function renderDashboard(){
+ const arr=dashboardServices();
+ const fat=arr.reduce((a,s)=>a+s.valor,0);
+ const costs=arr.reduce((a,s)=>a+serviceCostValue(s),0);
+ const lucro=fat-costs;
+ const recebido=arr.filter(s=>s.status==='Recebido').reduce((a,s)=>a+s.valor,0);
+ const margem=fat?lucro/fat*100:0;
+ dashboardKpis.innerHTML=`
+ <div class="kpi"><span>Faturamento</span><strong>${money(fat)}</strong></div>
+ <div class="kpi"><span>Custos</span><strong>${money(costs)}</strong></div>
+ <div class="kpi"><span>Lucro</span><strong>${money(lucro)}</strong></div>
+ <div class="kpi"><span>Margem</span><strong>${margem.toFixed(1)}%</strong></div>
+ <div class="kpi"><span>Recebido</span><strong>${money(recebido)}</strong></div>
+ <div class="kpi"><span>A receber</span><strong>${money(fat-recebido)}</strong></div>`;
+ const byClient={};
+ arr.forEach(s=>{const n=clientName(s.clientId);byClient[n]=(byClient[n]||0)+s.valor});
+ const top=Object.entries(byClient).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ topClients.innerHTML=top.length?top.map((x,i)=>`<p><b>${i+1}. ${esc(x[0])}</b> — ${money(x[1])}</p>`).join(''):'<p class="muted">Sem dados.</p>';
+ const cats=[
+  ['Combustível',arr.reduce((a,s)=>a+s.comb,0)],
+  ['Pedágio',arr.reduce((a,s)=>a+s.ped,0)],
+  ['Terceirização',arr.reduce((a,s)=>a+s.ter,0)],
+  ['Alimentação',arr.reduce((a,s)=>a+(Number(s.alimentacao)||0),0)],
+  ['Hotel',arr.reduce((a,s)=>a+(Number(s.hotel)||Number(s.hospedagem)||0),0)],
+  ['Manutenção',arr.reduce((a,s)=>a+(Number(s.manutencao)||0),0)],
+   ['Outros',arr.reduce((a,s)=>a+s.outros,0)]
+ ];
+ costBreakdown.innerHTML=cats.map(x=>`<p><b>${x[0]}</b> — ${money(x[1])}</p>`).join('');
+}
+function renderFinance(){
+ const cid=fCliente.value, de=fDe.value, ate=fAte.value;
+ let arr=db.services.filter(s=>(!cid||s.clientId==cid)&&(!de||s.date>=de)&&(!ate||s.date<=ate));
+ const fat=arr.reduce((a,s)=>a+s.valor,0),cost=arr.reduce((a,s)=>a+serviceCostValue(s),0),lucro=fat-cost,rec=arr.filter(s=>s.status==='Recebido').reduce((a,s)=>a+s.valor,0);
+ finance.innerHTML=`<div class="kpi"><span>Serviços</span><strong>${arr.length}</strong></div><div class="kpi"><span>Faturamento</span><strong>${money(fat)}</strong></div><div class="kpi"><span>Custos</span><strong>${money(cost)}</strong></div><div class="kpi"><span>Lucro</span><strong>${money(lucro)}</strong></div><div class="kpi"><span>Recebido</span><strong>${money(rec)}</strong></div><div class="kpi"><span>A receber</span><strong>${money(fat-rec)}</strong></div>`
+}
+function editVehicle(id){
+ const v=db.vehicles.find(x=>x.id===id);
+ if(!v)return;
+ const nome=prompt('Nome do veículo:',v.nome);
+ if(nome===null)return;
+ const placa=prompt('Placa:',v.placa||'');
+ if(placa===null)return;
+ const consumoRaw=prompt('Consumo (km/L):',v.consumo);
+ if(consumoRaw===null)return;
+ const consumo=Number(consumoRaw);
+ if(!nome.trim()||!consumo||consumo<=0){alert('Informe dados válidos.');return}
+ v.nome=nome.trim();v.placa=placa.trim();v.consumo=consumo;
+ save();
+}
+function editClient(id){
+ const c=db.clients.find(x=>x.id===id);
+ if(!c)return;
+ const nome=prompt('Nome do cliente:',c.nome);
+ if(nome===null)return;
+ const contato=prompt('Contato (opcional):',c.contato||'');
+ if(contato===null)return;
+ if(!nome.trim()){alert('Informe o nome do cliente.');return}
+ c.nome=nome.trim();c.contato=contato.trim();
+ save();
+}
+function deleteVehicle(id){
+ const v=db.vehicles.find(x=>x.id===id);
+ if(!v)return;
+ if(confirm(`Excluir o veículo "${v.nome}"?`)){
+   db.vehicles=db.vehicles.filter(x=>x.id!==id);
+   save();
+ }
+}
+function deleteClient(id){
+ const c=db.clients.find(x=>x.id===id);
+ if(!c)return;
+ const hasServices=db.services.some(s=>s.clientId===id);
+ const msg=hasServices
+   ? `O cliente "${c.nome}" possui serviços registrados. Excluir o cliente não apagará esses serviços, mas eles ficarão como "Cliente não informado". Continuar?`
+   : `Excluir o cliente "${c.nome}"?`;
+ if(confirm(msg)){
+   db.clients=db.clients.filter(x=>x.id!==id);
+   save();
+ }
+}
+function markReceived(id){
+ const s=db.services.find(x=>x.id===id);
+ if(!s)return;
+ if(confirm(`Confirmar recebimento de ${money(s.valor)} deste serviço?`)){
+   s.status='Recebido';
+   s.receivedDate=new Date().toISOString().slice(0,10);
+   save();
+ }
+}
+function clearService(id){if(confirm('Limpar somente este serviço?')){db.services=db.services.filter(s=>s.id!==id);save()}}
+function clearAll(){if(confirm('Apagar TODOS os clientes, veículos, serviços e dados financeiros?')){db={vehicles:[],clients:[],services:[]};save()}}
+function exportCSV(){
+ const rows=[['Data','Cliente','Origem','Destino','Faturamento','Status','Combustível','Pedágio','Terceirização','Alimentação','Hotel','Outros','Custos Totais','Lucro']];
+ db.services.forEach(s=>rows.push([s.date,clientName(s.clientId),s.origem,s.destino,s.valor,s.status,s.comb,s.ped,s.ter,s.alimentacao||0,s.hotel||s.hospedagem||0,s.outros,serviceCostValue(s),s.valor-serviceCostValue(s)]));
+ const csv=rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(';')).join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='assistente_operacional_servicos.csv';a.click()
+}
+function options(select,items,placeholder){
+ select.innerHTML=`<option value="">${placeholder}</option>`+items.map(x=>`<option value="${x.id}">${esc(x.nome)}</option>`).join('')
+}
+function renderAll(){
+ vehicles.innerHTML=db.vehicles.length?db.vehicles.map(v=>`<div class="client-card"><b>${esc(v.nome)}</b> • ${esc(v.placa||'sem placa')} • ${Number(v.consumo||0).toFixed(1)} km/L <button class="secondary" style="float:right;padding:7px 10px;margin-left:6px" onclick="editVehicle(${v.id})">Editar</button><button class="danger" style="float:right;padding:7px 10px" onclick="deleteVehicle(${v.id})">Excluir veículo</button></div>`).join(''):'<p class="muted">Nenhum veículo cadastrado.</p>';
+ clients.innerHTML=db.clients.length?db.clients.map(c=>`<div class="client-card"><b>${esc(c.nome)}</b> • ${esc(c.contato||'sem contato')}${c.cnpj?` • CNPJ: ${esc(c.cnpj)}`:''} <button class="secondary" style="float:right;padding:7px 10px;margin-left:6px" onclick="editClient(${c.id})">Editar</button><button class="danger" style="float:right;padding:7px 10px" onclick="deleteClient(${c.id})">Excluir cliente</button></div>`).join(''):'<p class="muted">Nenhum cliente cadastrado.</p>';
+ options(aCliente,db.clients,'Selecione o cliente');options(sCliente,db.clients,'Selecione o cliente');options(fCliente,db.clients,'Todos os clientes');options(aVeiculo,db.vehicles,'Selecione o veículo');options(sVeiculo,db.vehicles,'Selecione o veículo');options(crCliente,db.clients,'Selecione o cliente');syncConsumption();renderServices();renderFinance();renderDashboard();populateRecommendationSelectors();updateManagementDashboard();updateHistoryInsights();renderReceivables();renderClosuresHistory();
+}
+sData.value=new Date().toISOString().slice(0,10);fDe.value=new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().slice(0,10);fAte.value=new Date().toISOString().slice(0,10);crDe.value=new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().slice(0,10);crAte.value=new Date().toISOString().slice(0,10);
+// Migração segura de dados antigos: quando existe apenas um veículo cadastrado,
+// os serviços antigos sem veículoId passam a ser vinculados a ele para que o painel
+// consiga apresentar a rentabilidade por veículo sem alterar os demais dados.
+if((db.vehicles||[]).length===1){
+  const onlyVehicle=db.vehicles[0].id;
+  let changed=false;
+  db.services.forEach(s=>{
+    const valid=(db.vehicles||[]).some(v=>String(v.id)===String(s.vehicleId));
+    if(!valid){
+      s.vehicleId=onlyVehicle;
+      changed=true;
+    }
+  });
+  if(changed) localStorage.setItem(KEY,JSON.stringify(db));
+}
+renderAll();
+
+function updateHistoryInsights(){
+  const box=document.getElementById('historyInsights');
+  if(!box) return;
+  const rows=(db.services||[]).filter(s=>Number(s.valor)>0);
+  if(!rows.length){
+    box.innerHTML='<p class="muted">Ainda não há fretes suficientes para gerar um histórico. Registre alguns serviços e o sistema começará a comparar seu desempenho.</p>';
+    return;
+  }
+  const vals=rows.map(s=>Number(s.valor)||0);
+  const costs=rows.map(s=>serviceCostValue(s));
+  const profits=rows.map(s=>(Number(s.valor)||0)-(Number(s.custos)||0));
+  const margins=rows.map((s,i)=>vals[i]?profits[i]/vals[i]*100:0);
+  const avgFrete=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const avgCusto=costs.reduce((a,b)=>a+b,0)/rows.length;
+  const avgLucro=profits.reduce((a,b)=>a+b,0)/rows.length;
+  const avgMargem=margins.reduce((a,b)=>a+b,0)/rows.length;
+  const best=Math.max(...margins);
+  const worst=Math.min(...margins);
+  const positive=profits.filter(v=>v>0).length;
+  const taxa=positive/rows.length*100;
+
+  let cls='good', msg='Seu histórico está saudável.';
+  if(avgMargem<20){cls='bad';msg='Sua margem média está baixa. Vale revisar preço, rotas e custos.'}
+  else if(avgMargem<30){cls='warn';msg='Sua margem média merece atenção. Compare os fretes antes de aceitar.'}
+
+  box.innerHTML=`
+    <div class="insight-grid">
+      <div class="insight"><span>Fretes analisados</span><strong>${rows.length}</strong></div>
+      <div class="insight"><span>Frete médio</span><strong>${money(avgFrete)}</strong></div>
+      <div class="insight"><span>Custo médio</span><strong>${money(avgCusto)}</strong></div>
+      <div class="insight ${cls}"><span>Lucro médio</span><strong>${money(avgLucro)}</strong></div>
+      <div class="insight ${cls}"><span>Margem média</span><strong>${avgMargem.toFixed(1)}%</strong></div>
+      <div class="insight"><span>Fretes com lucro</span><strong>${taxa.toFixed(0)}%</strong></div>
+      <div class="insight good"><span>Melhor margem</span><strong>${best.toFixed(1)}%</strong></div>
+      <div class="insight ${worst<20?'bad':'warn'}"><span>Menor margem</span><strong>${worst.toFixed(1)}%</strong></div>
+    </div>
+    <div class="result ${cls}" style="margin-top:14px">
+      <b>📊 Leitura do seu histórico</b>
+      <p>${msg}</p>
+      <p class="muted">Quando houver mais dados, essa área poderá recomendar um valor mínimo de frete baseado no seu próprio histórico.</p>
+    </div>`;
+}
+
+
+document.addEventListener("DOMContentLoaded",()=>setTimeout(renderReceivables,120));
+document.addEventListener("DOMContentLoaded",()=>setTimeout(populateReceivablesClientSelector,100));
+document.addEventListener("DOMContentLoaded",()=>setTimeout(initClientComparison,150));
+</script>
+</body>
+</html>
+<script>
+document.addEventListener('DOMContentLoaded',()=>setTimeout(updateHistoryInsights,50));
+
+function recommendPrice(){
+  const km=Number(document.getElementById('pKm')?.value)||0;
+  const cons=Number(document.getElementById('pConsumo')?.value)||0;
+  const diesel=Number(document.getElementById('pDiesel')?.value)||0;
+  const ped=Number(document.getElementById('pPedagio')?.value)||0;
+  const ter=Number(document.getElementById('pTerceiro')?.value)||0;
+  const pv=document.getElementById('pVeiculo')?.value ? db.vehicles.find(v=>String(v.id)===String(document.getElementById('pVeiculo').value)) : null;
+  const manut=0;
+  const meta=(Number(document.getElementById('pMeta')?.value)||30)/100;
+  const ideal=(Number(document.getElementById('pIdeal')?.value)||35)/100;
+  const out=document.getElementById('priceRecommendation');
+
+  if(km<=0 || cons<=0 || diesel<=0){
+    out.innerHTML='<div class="result warn"><b>⚠️ Complete distância, consumo e diesel.</b></div>';
+    return;
+  }
+  if(ideal<meta){
+    out.innerHTML='<div class="result warn"><b>⚠️ A margem ideal precisa ser maior ou igual à margem desejada.</b></div>';
+    return;
+  }
+
+  const combust=km/cons*diesel;
+  const custo=combust+ped+ter+manut;
+  const minimo=custo/(1-meta);
+  const idealPrice=custo/(1-ideal);
+  const piso=Math.max(custo*1.05,minimo);
+  const teto=idealPrice*1.08;
+  const kmMin=minimo/km;
+  const kmIdeal=idealPrice/km;
+
+  out.innerHTML=`
+    <div class="price-grid">
+      <div class="price-card"><span>Custo estimado</span><strong>${money(custo)}</strong><small>inclui combustível, pedágio e outros</small></div>
+      <div class="price-card primary"><span>Preço mínimo</span><strong>${money(minimo)}</strong><small>para ${ (meta*100).toFixed(0)}% de margem</small></div>
+      <div class="price-card primary"><span>Preço ideal</span><strong>${money(idealPrice)}</strong><small>para ${ (ideal*100).toFixed(0)}% de margem</small></div>
+      <div class="price-card alert"><span>Faixa sugerida</span><strong>${money(piso)} — ${money(teto)}</strong><small>referência comercial inicial</small></div>
+    </div>
+    <div class="result good" style="margin-top:14px">
+      <b>🎯 Minha recomendação</b>
+      <p>Comece a negociação em <strong>${money(teto)}</strong> e evite fechar abaixo de <strong>${money(minimo)}</strong>, salvo uma decisão estratégica.</p>
+      <p class="muted">Isso representa aproximadamente ${money(kmMin)}/km no preço mínimo e ${money(kmIdeal)}/km no preço ideal.</p>
+    </div>`;
+}
+
+
+
+function populateClientComparison(){
+  const c=document.getElementById('cmpCliente');
+  if(!c || typeof db==='undefined') return;
+  const current=c.value;
+  c.innerHTML='<option value="">Todos os clientes</option>'+(db.clients||[]).map(x=>`<option value="${esc(x.id)}">${esc(x.nome)}</option>`).join('');
+  if(current) c.value=current;
+}
+
+function compareClients(){
+  const out=document.getElementById('clientComparison');
+  if(!out) return;
+
+  const de=(document.getElementById('cmpDataDe')?.value||'').trim();
+  const ate=(document.getElementById('cmpDataAte')?.value||'').trim();
+
+  const rows=(db.services||[]).filter(s=>{
+    const value=Number(s.valor)||0;
+    return value>0 &&
+      (!de || String(s.date||'')>=de) &&
+      (!ate || String(s.date||'')<=ate);
+  });
+
+  const grouped={};
+  rows.forEach(s=>{
+    const client=(db.clients||[]).find(c=>String(c.id)===String(s.clientId));
+    const name=client?.nome || 'Cliente não informado';
+    const cost=(Number(s.custos)||0) ||
+      (serviceCostValue(s));
+    if(!grouped[name]) grouped[name]={count:0,fat:0,cost:0,received:0};
+    grouped[name].count++;
+    grouped[name].fat+=Number(s.valor)||0;
+    grouped[name].cost+=cost;
+    if(String(s.status||'').toLowerCase()==='recebido') grouped[name].received+=Number(s.valor)||0;
+  });
+
+  const ranking=Object.entries(grouped)
+    .map(([name,v])=>{
+      const profit=v.fat-v.cost;
+      return {
+        name,
+        count:v.count,
+        fat:v.fat,
+        cost:v.cost,
+        profit,
+        margin:v.fat ? profit/v.fat*100 : 0,
+        received:v.received,
+        receivable:Math.max(0,v.fat-v.received)
+      };
+    })
+    .sort((a,b)=>b.profit-a.profit);
+
+  if(!ranking.length){
+    out.innerHTML='<div class="result warn"><b>⚠️ Ainda não há dados suficientes.</b><p class="muted">Registre serviços para começar a comparar seus clientes.</p></div>';
+    return;
+  }
+
+  const top=ranking[0];
+  const topMargin=[...ranking].sort((a,b)=>b.margin-a.margin)[0];
+  const topFat=[...ranking].sort((a,b)=>b.fat-a.fat)[0];
+
+  out.innerHTML=`
+    <div class="insight-grid">
+      <div class="insight good"><span>🏆 Maior retorno</span><strong>${esc(top.name)}</strong><small>Lucro ${money(top.profit)}</small></div>
+      <div class="insight"><span>💰 Maior faturamento</span><strong>${esc(topFat.name)}</strong><small>${money(topFat.fat)}</small></div>
+      <div class="insight"><span>📈 Maior margem</span><strong>${esc(topMargin.name)}</strong><small>${topMargin.margin.toFixed(1)}%</small></div>
+      <div class="insight"><span>👥 Clientes</span><strong>${ranking.length}</strong><small>com serviços no período</small></div>
+    </div>
+
+    <div class="result" style="margin-top:14px">
+      <b>📊 Ranking de retorno</b>
+      <table style="margin-top:10px">
+        <tr>
+          <th>#</th><th>Cliente</th><th>Serviços</th><th>Faturamento</th>
+          <th>Custos</th><th>Lucro</th><th>Margem</th><th>A receber</th>
+        </tr>
+        ${ranking.map((x,i)=>`
+          <tr>
+            <td><b>${i+1}</b></td>
+            <td><b>${esc(x.name)}</b></td>
+            <td>${x.count}</td>
+            <td>${money(x.fat)}</td>
+            <td>${money(x.cost)}</td>
+            <td><b>${money(x.profit)}</b></td>
+            <td>${x.margin.toFixed(1)}%</td>
+            <td>${money(x.receivable)}</td>
+          </tr>`).join('')}
+      </table>
+    </div>
+
+    <div class="result good" style="margin-top:14px">
+      <b>💡 Leitura rápida</b>
+      <p><strong>${esc(top.name)}</strong> é o cliente que apresenta o maior lucro no período selecionado.</p>
+      <p class="muted">A comparação usa os serviços registrados e considera faturamento, custos operacionais, lucro, margem e valores recebidos.</p>
+    </div>`;
+}
+function updateManagementDashboard(){
+  if(typeof db==='undefined') return;
+
+  // O painel gerencial usa exatamente a mesma base do Financeiro.
+  // Aceita tanto o formato atual (valor/comb/ped/ter/outros)
+  // quanto registros antigos que possam ter usado nomes diferentes.
+  const all=(db.services||[]);
+  const num=(...vals)=>{for(const v of vals){const n=Number(v);if(Number.isFinite(n)) return n;}return 0;};
+  const serviceValue=s=>num(s.valor,s.faturamento,s.value);
+  const serviceCost=s=>num(
+    s.custos,
+    num(s.comb,s.combustivel)+num(s.ped,s.pedagio)+num(s.ter,s.terceirizacao)+num(s.alimentacao,s.alimentacaoValor,s.food)+num(s.hotel,s.hospedagem)+num(s.motoristaDiarias)+num(s.horasExtras)+num(s.manutencao)+num(s.outros)
+  );
+  const clientLabel=s=>{
+    if(s.clientId!=null){
+      const c=(db.clients||[]).find(x=>String(x.id)===String(s.clientId));
+      if(c?.nome) return c.nome;
+    }
+    return s.cliente || 'Não informado';
+  };
+  const vehicleLabel=s=>{
+    const id=s.vehicleId ?? s.veiculoId;
+    const vById=(db.vehicles||[]).find(x=>String(x.id)===String(id));
+    if(vById?.nome) return vById.nome;
+    if((db.vehicles||[]).length===1) return db.vehicles[0].nome;
+    return s.veiculo || s.vehicleNome || 'Não informado';
+  };
+
+  const rows=all.filter(s=>serviceValue(s)>0);
+  const fat=rows.reduce((a,s)=>a+serviceValue(s),0);
+  const cost=rows.reduce((a,s)=>a+serviceCost(s),0);
+  const profit=fat-cost;
+  const margin=fat?profit/fat:0;
+  const received=rows.filter(s=>String(s.status||'').trim().toLowerCase()==='recebido')
+                     .reduce((a,s)=>a+serviceValue(s),0);
+
+  const group=(keyFn)=>{
+    const m={};
+    rows.forEach(s=>{
+      const k=keyFn(s)||'Não informado';
+      if(!m[k])m[k]={fat:0,cost:0,count:0};
+      m[k].fat+=serviceValue(s);
+      m[k].cost+=serviceCost(s);
+      m[k].count++;
+    });
+    return Object.entries(m)
+      .map(([key,v])=>({...v,key,profit:v.fat-v.cost}))
+      .sort((a,b)=>b.profit-a.profit);
+  };
+
+  const clients=group(clientLabel);
+  const vehicles=group(vehicleLabel).filter(x=>x.key!=='Não informado');
+  const routes=group(s=>`${s.origem||'—'} → ${s.destino||'—'}`);
+
+  const set=(id,val)=>{const e=document.getElementById(id);if(e)e.textContent=val;};
+  set('dashFat',money(fat));
+  set('dashCost',money(cost));
+  set('dashProfit',money(profit));
+  set('dashMargin',(margin*100).toFixed(1)+'%');
+  set('dashCount',rows.length);
+  set('dashReceivable',money(Math.max(0,fat-received)));
+  set('dashTopClient',clients[0]?`${clients[0].key} • lucro ${money(clients[0].profit)}`:'—');
+  set('dashTopVehicle',vehicles[0]?`${vehicles[0].key} • lucro ${money(vehicles[0].profit)}`:((db.vehicles||[]).length?'Nenhum veículo identificado nos serviços.':'Nenhum veículo cadastrado.'));
+  set('dashTopRoute',routes[0]?`${routes[0].key} • lucro ${money(routes[0].profit)}`:'—');
+
+  const low=rows.filter(s=>{
+    const value=serviceValue(s), c=serviceCost(s);
+    return value>0 && ((value-c)/value)<0.30;
+  });
+  set('dashAlert',low.length
+    ? `${low.length} frete(s) com margem abaixo de 30%.`
+    : 'Nenhum frete crítico identificado.');
+}
+document.addEventListener("DOMContentLoaded",()=>setTimeout(updateManagementDashboard,250));
+
+
+function clientById(id){return (db.clients||[]).find(c=>String(c.id)===String(id))||null;}
+function vehicleName(id){return (db.vehicles||[]).find(v=>String(v.id)===String(id))?.nome||'';}
+function closureVehicleName(s, arr){
+  // O nome do veículo deve vir somente de um veículo realmente cadastrado.
+  // Isso evita que uma data/valor gravado por engano no campo de veículo
+  // seja exportado para o Excel.
+  const directId=s?.vehicleId ?? s?.veiculoId;
+  const direct=vehicleName(directId);
+  if(direct) return direct;
+
+  // Alguns fechamentos antigos podem ter vehicleId inválido ou ausente.
+  // Procura somente IDs que correspondem a veículos existentes.
+  const validNames=[...(arr||[])]
+    .map(x=>{
+      const id=x?.vehicleId ?? x?.veiculoId;
+      return vehicleName(id);
+    })
+    .filter(Boolean);
+  const uniqueNames=[...new Set(validNames)];
+  if(uniqueNames.length===1) return uniqueNames[0];
+
+  // Se o fechamento não tiver veículo identificável, usa o único veículo
+  // cadastrado no sistema, quando houver.
+  if((db.vehicles||[]).length===1) return db.vehicles[0].nome || '—';
+  return '—';
+}
+
+function normalizeClosureVehicles(){
+  let changed=false;
+  (db.closures||[]).forEach(c=>{
+    const arr=c.servicesSnapshot||[];
+    if(!arr.length) return;
+
+    // Considera somente veículos que realmente existem no cadastro.
+    const validIds=[...new Set(arr.map(s=>{
+      const id=s?.vehicleId ?? s?.veiculoId;
+      return vehicleName(id) ? String(id) : '';
+    }).filter(Boolean))];
+
+    if(validIds.length!==1) return;
+    const vid=validIds[0], name=vehicleName(vid);
+    if(!name) return;
+
+    arr.forEach(s=>{
+      const currentId=s?.vehicleId ?? s?.veiculoId;
+      if(!vehicleName(currentId)){
+        s.vehicleId=vid;
+        s.vehicleNome=name;
+        changed=true;
+      } else if(s.vehicleNome!==name){
+        s.vehicleNome=name;
+        changed=true;
+      }
+    });
+    c.servicesSnapshot=arr;
+  });
+  if(changed) localStorage.setItem(KEY,JSON.stringify(db));
+}
+
+function closureServices(c){return (c.serviceIds||[]).map(id=>(db.services||[]).find(s=>String(s.id)===String(id))).filter(Boolean);}
+function closureNumber(){
+  const year=new Date().getFullYear();
+  const nums=(db.closures||[]).map(c=>String(c.number||'')).filter(n=>n.startsWith(`AO-${year}-`)).map(n=>Number(n.split('-').pop())).filter(Number.isFinite);
+  const next=(nums.length?Math.max(...nums):0)+1;
+  return `AO-${year}-${String(next).padStart(4,'0')}`;
+}
+
+function closureSignature(clientId,de,ate,serviceIds){
+  return [String(clientId||''),String(de||''),String(ate||''),(serviceIds||[]).map(String).sort().join(',')].join('|');
+}
+function filteredReceivableServices(){const cid=document.getElementById('crCliente')?.value||'',de=document.getElementById('crDe')?.value||'',ate=document.getElementById('crAte')?.value||'';return (db.services||[]).filter(s=>(!cid||String(s.clientId)===String(cid))&&(!de||String(s.date||'')>=String(de))&&(!ate||String(s.date||'')<=String(ate)));}
+function renderReceivables(){if(!document.getElementById('receivablePreview'))return;const arr=filteredReceivableServices();const fat=arr.reduce((a,s)=>a+Number(s.valor||0),0),rec=arr.filter(s=>String(s.status).toLowerCase()==='recebido').reduce((a,s)=>a+Number(s.valor||0),0);receivableKpis.innerHTML=`<div class="kpi"><span>Serviços</span><strong>${arr.length}</strong></div><div class="kpi"><span>Faturamento</span><strong>${money(fat)}</strong></div><div class="kpi"><span>Recebido</span><strong>${money(rec)}</strong></div><div class="kpi"><span>A receber</span><strong>${money(fat-rec)}</strong></div>`;if(!arr.length){receivablePreview.innerHTML='<div class="result warn"><b>Selecione um cliente e período com serviços registrados.</b></div>';return;}receivablePreview.innerHTML=`<div class="result"><b>Prévia do fechamento</b><p>${arr.length} serviço(s) • Total ${money(fat)}</p><table><tr><th>Data</th><th>Origem</th><th>Destino</th><th>Veículo</th><th>Valor</th></tr>${arr.map(s=>`<tr><td>${esc(s.date)}</td><td>${esc(s.origem||'—')}</td><td>${esc(s.destino||'—')}</td><td>${esc(closureVehicleName(s,arr)||'—')}</td><td>${money(s.valor)}</td></tr>`).join('')}</table></div>`;}
+
+function getReceivablesSelection(){
+  const clientSelect=document.getElementById('crCliente');
+  const clientId=clientSelect ? String(clientSelect.value||'') : '';
+  const de=(document.getElementById('crDe')?.value || '').trim();
+  const ate=(document.getElementById('crAte')?.value || '').trim();
+  return {clientId,de,ate};
+}
+
+function getServicesForSelection(){
+  const {clientId,de,ate}=getReceivablesSelection();
+  return (db.services||[]).filter(s=>{
+    if(!clientId || String(s.clientId||'')!==clientId) return false;
+    if(de && String(s.date||'')<de) return false;
+    if(ate && String(s.date||'')>ate) return false;
+    return Number(s.valor||0)>0;
+  });
+}
+
+function createClosure(){
+  const {clientId,de,ate}=getReceivablesSelection();
+  const out=document.getElementById('receivablePreview');
+
+  if(!clientId){
+    if(out) out.innerHTML='<div class="result warn"><b>⚠️ Selecione um cliente antes de gerar o fechamento.</b></div>';
+    alert('Selecione um cliente antes de gerar o fechamento.');
+    return;
+  }
+
+  const client=(db.clients||[]).find(c=>String(c.id)===clientId);
+  const rows=getServicesForSelection();
+
+  if(!rows.length){
+    if(out) out.innerHTML='<div class="result warn"><b>⚠️ Nenhum serviço encontrado para este cliente no período selecionado.</b></div>';
+    alert('Nenhum serviço encontrado para este cliente no período selecionado.');
+    return;
+  }
+
+  const total=rows.reduce((a,s)=>a+(Number(s.valor)||0),0);
+  const serviceIds=rows.map(s=>s.id);
+  const signature=closureSignature(clientId,de,ate,serviceIds);
+  const duplicate=(db.closures||[]).find(c=>c.signature===signature || closureSignature(c.clientId,c.periodStart,c.periodEnd,c.serviceIds)===signature);
+  if(duplicate){
+    if(out) out.innerHTML=`<div class="result warn"><b>⚠️ Este fechamento já foi gerado.</b><p>Fechamento <strong>${esc(duplicate.number)}</strong> já existe no histórico para este cliente, período e mesmos serviços.</p><div class="actions"><button class="secondary" onclick="openClosure(${duplicate.id})">Abrir fechamento existente</button></div></div>`;
+    return;
+  }
+
+  // Snapshot completo: o fechamento fica independente de alterações posteriores nos serviços.
+  // Se houver apenas um veículo identificado nos serviços selecionados, ele também é
+  // usado como fallback para registros antigos que ficaram sem vehicleId.
+  const selectedVehicleIds=[...new Set(rows.map(s=>String(s.vehicleId ?? s.veiculoId ?? '')).filter(Boolean))];
+  const singleSelectedVehicleId=selectedVehicleIds.length===1 ? selectedVehicleIds[0] : null;
+  const snapshot=rows.map(s=>{
+    const inferredVehicleId=s.vehicleId ?? s.veiculoId ?? singleSelectedVehicleId ?? null;
+    return {
+      ...s,
+      clientId:s.clientId,
+      vehicleId:inferredVehicleId,
+      vehicleNome:closureVehicleName({...s,vehicleId:inferredVehicleId}, rows)
+    };
+  });
+
+  const closure={
+    id:Date.now(),
+    number:closureNumber(),
+    clientId:Number(clientId),
+    clientName:client?.nome||'Cliente não informado',
+    periodStart:de||rows.map(s=>s.date).sort()[0]||'',
+    periodEnd:ate||rows.map(s=>s.date).sort().slice(-1)[0]||'',
+    createdAt:new Date().toISOString().slice(0,10),
+    status:'Salvo',
+    total,
+    serviceIds,
+    signature,
+    servicesSnapshot:snapshot
+  };
+
+  if(!Array.isArray(db.closures)) db.closures=[];
+  db.closures.push(closure);
+  localStorage.setItem(KEY,JSON.stringify(db));
+
+  renderClosurePreview(closure);
+  if(typeof renderClosuresHistory==='function') renderClosuresHistory();
+  if(typeof renderReceivableKpis==='function') renderReceivableKpis();
+
+  alert('Fechamento gerado e salvo com sucesso.');
+}
+
+function renderClosurePreview(c){
+  const box=document.getElementById('receivablePreview');
+  if(!box) return;
+  const arr=c.servicesSnapshot||[];
+  box.innerHTML=`
+    <div class="result good">
+      <h3 style="margin-top:0">Fechamento Nº ${esc(c.number||'')}</h3>
+      <p><b>Cliente:</b> ${esc(c.clientName||'Cliente')}<br>
+      <b>Período:</b> ${esc(c.periodStart||'')} a ${esc(c.periodEnd||'')}<br>
+      <b>Serviços:</b> ${arr.length}</p>
+      <table>
+        <tr><th>Data</th><th>Origem</th><th>Destino</th><th>Veículo</th><th>Valor</th></tr>
+        ${arr.map(s=>{
+          const v=(db.vehicles||[]).find(x=>String(x.id)===String(s.vehicleId));
+          return `<tr>
+            <td>${esc(s.date||'')}</td>
+            <td>${esc(s.origem||'—')}</td>
+            <td>${esc(s.destino||'—')}</td>
+            <td>${esc(closureVehicleName(s,arr))}</td>
+            <td>${money(s.valor)}</td>
+          </tr>`;
+        }).join('')}
+        <tr>
+          <td colspan="4" style="text-align:right"><b>TOTAL:</b></td>
+          <td><b>${money(c.total)}</b></td>
+        </tr>
+      </table>
+      <div class="actions">
+        <button class="green" onclick="exportClosureExcel(${c.id})">📊 Salvar Excel</button>
+        <button class="green" onclick="printClosurePDF(${c.id})">📄 Salvar/Imprimir PDF</button>
+        <button onclick="shareClosure(${c.id})">📤 Enviar</button>
+        <button class="secondary" onclick="showClosureDetail(${c.id})">🔎 Detalhar serviços</button>
+      </div>
+    </div>`;
+}
+
+function openClosure(id){const c=db.closures.find(x=>x.id===id);if(!c)return;const arr=c.servicesSnapshot||closureServices(c),client=clientById(c.clientId);receivablePreview.innerHTML=`<div class="result good"><b>✅ ${esc(c.number)} salvo</b><p><b>${esc(client?.nome||'Cliente')}</b> • ${esc(c.periodStart)} a ${esc(c.periodEnd)} • ${arr.length} serviço(s) • <strong>${money(c.total)}</strong></p><div class="actions"><button class="green" onclick="exportClosureExcel(${c.id})">📊 Salvar Excel</button><button class="green" onclick="printClosurePDF(${c.id})">📄 Salvar/Imprimir PDF</button><button onclick="shareClosure(${c.id})">📤 Enviar</button><button class="secondary" onclick="showClosureDetail(${c.id})">🔎 Detalhar serviços</button></div></div>`;renderClosuresHistory();}
+function showClosureDetail(id){const c=db.closures.find(x=>x.id===id);if(!c)return;const arr=c.servicesSnapshot||closureServices(c);receivablePreview.innerHTML=`<div class="result"><b>Detalhamento — ${esc(c.number)}</b><table><tr><th>Data</th><th>Rota</th><th>Veículo</th><th>Frete</th><th>Custos</th><th>Lucro</th></tr>${arr.map(s=>`<tr><td>${esc(s.date)}</td><td>${esc(s.origem||'—')} → ${esc(s.destino||'—')}</td><td>${esc(closureVehicleName(s,arr)||'—')}</td><td>${money(s.valor)}</td><td>${money(serviceCostValue(s))}</td><td>${money(Number(s.valor||0)-serviceCostValue(s))}</td></tr>`).join('')}</table><div class="actions"><button class="green" onclick="exportClosureExcel(${c.id})">📊 Salvar Excel</button><button class="green" onclick="printClosurePDF(${c.id})">📄 Salvar/Imprimir PDF</button><button class="secondary" onclick="openClosure(${c.id})">Voltar</button></div></div>`;}
+function renderClosuresHistory(){if(!closuresHistory)return;const arr=db.closures||[];closuresHistory.innerHTML=arr.length?`<div class="result"><h3>📚 Histórico de fechamentos</h3><table><tr><th>Nº</th><th>Cliente</th><th>Período</th><th>Total</th><th>Status</th><th>Ação</th></tr>${arr.slice().reverse().map(c=>`<tr><td>${esc(c.number)}</td><td>${esc(clientById(c.clientId)?.nome||'—')}</td><td>${esc(c.periodStart)} → ${esc(c.periodEnd)}</td><td>${money(c.total)}</td><td>${esc(c.status)}</td><td><button class="secondary" style="padding:7px 10px" onclick="openClosure(${c.id})">Abrir</button></td></tr>`).join('')}</table></div>`:'<p class="muted">Nenhum fechamento salvo.</p>';}
+function closureHtml(c){const client=clientById(c.clientId),arr=c.servicesSnapshot||closureServices(c);return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${esc(c.number)}</title><style>@page{size:A4;margin:12mm}body{font-family:Arial;color:#17202a;font-size:12px}h1{font-size:22px;margin:0}.head{border-bottom:2px solid #17202a;padding-bottom:12px;margin-bottom:14px}.meta{display:grid;grid-template-columns:1fr 1fr;gap:6px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{padding:7px;border-bottom:1px solid #ddd;text-align:left}th{background:#f2f4f7}.total{text-align:right;font-size:18px;font-weight:bold;margin-top:16px}.foot{margin-top:24px;color:#64748b;font-size:10px}</style></head><body><div class="head"><h1>ASSISTENTE OPERACIONAL</h1><div>Fechamento de Serviços</div></div><div class="meta"><div><b>Fechamento:</b> ${esc(c.number)}</div><div><b>Emissão:</b> ${esc(c.createdAt)}</div><div><b>Cliente:</b> ${esc(client?.nome||'—')}</div><div><b>CNPJ:</b> ${esc(client?.cnpj||'—')}</div><div><b>Período:</b> ${esc(c.periodStart)} a ${esc(c.periodEnd)}</div><div><b>Serviços:</b> ${arr.length}</div></div><table><tr><th>Data</th><th>Origem</th><th>Destino</th><th>Veículo</th><th>Valor</th></tr>${arr.map(s=>`<tr><td>${esc(s.date)}</td><td>${esc(s.origem||'—')}</td><td>${esc(s.destino||'—')}</td><td>${esc(closureVehicleName(s,arr)||'—')}</td><td>${money(s.valor)}</td></tr>`).join('')}</table><div class="total">TOTAL: ${money(c.total)}</div><div class="foot">Documento gerado pelo Assistente Operacional. Os serviços permanecem vinculados ao fechamento para conferência.</div></body></html>`;}
+function printClosurePDF(id){const c=db.closures.find(x=>x.id===id);if(!c)return;const w=window.open('','_blank');if(!w){alert('Permita pop-ups para gerar o PDF.');return}w.document.write(closureHtml(c));w.document.close();w.focus();setTimeout(()=>w.print(),300);if(c.status==='Salvo'){c.status='Enviado';localStorage.setItem(KEY,JSON.stringify(db));renderClosuresHistory();}}
+async function shareClosure(id){const c=db.closures.find(x=>x.id===id);if(!c)return;const client=clientById(c.clientId),text=`Fechamento ${c.number}
+Cliente: ${client?.nome||'—'}
+Período: ${c.periodStart} a ${c.periodEnd}
+Total: ${money(c.total)}`;if(navigator.share){try{await navigator.share({title:`Fechamento ${c.number}`,text});if(c.status==='Salvo'){c.status='Enviado';localStorage.setItem(KEY,JSON.stringify(db));renderClosuresHistory()}return}catch(e){}}navigator.clipboard?.writeText(text);alert('Resumo copiado. Para enviar o PDF, use “Salvar/Imprimir PDF” e compartilhe o arquivo pelo WhatsApp ou e-mail.');}
+function excelVehicleLabel(s,arr){
+  const direct=vehicleName(s?.vehicleId ?? s?.veiculoId);
+  if(direct) return direct;
+  const valid=[...(arr||[])].map(x=>vehicleName(x?.vehicleId ?? x?.veiculoId)).filter(Boolean);
+  const unique=[...new Set(valid)];
+  if(unique.length===1) return unique[0];
+  if((db.vehicles||[]).length===1) return db.vehicles[0].nome||'—';
+  return '—';
+}
+
+function exportClosureExcel(id){
+  const c=db.closures.find(x=>x.id===id); if(!c)return;
+  normalizeClosureVehicles();
+  const client=clientById(c.clientId),arr=c.servicesSnapshot||closureServices(c);
+  const rows=arr.map(s=>{
+    const vehicle=excelVehicleLabel(s,arr);
+    const date=String(s.date||'—'), origin=String(s.origem||'—'), destination=String(s.destino||'—');
+    const value=Number(s.valor||0).toFixed(2).replace('.',',');
+    return `<tr><td class="txt">${esc(date)}</td><td class="txt">${esc(origin)}</td><td class="txt">${esc(destination)}</td><td class="txt vehicle">${esc(vehicle)}</td><td class="num">${value}</td></tr>`;
+  }).join('');
+  const html=`<html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:1cm}body{font-family:Arial;font-size:11pt}table{border-collapse:collapse;width:100%;margin-top:12px}th,td{border:1px solid #ccc;padding:6px}th{background:#e9edf2}.txt{mso-number-format:"@";white-space:nowrap}.vehicle{mso-number-format:"@";font-weight:normal}.num{mso-number-format:"#,##0.00"}.total{text-align:right;font-size:15pt;font-weight:bold;margin-top:12px}</style></head><body><h1>ASSISTENTE OPERACIONAL — FECHAMENTO DE SERVIÇOS</h1><p><b>Fechamento:</b> ${esc(c.number)} &nbsp; <b>Cliente:</b> ${esc(client?.nome||'—')} &nbsp; <b>CNPJ:</b> ${esc(client?.cnpj||'—')}</p><p><b>Período:</b> ${esc(c.periodStart||'')} a ${esc(c.periodEnd||'')} &nbsp; <b>Serviços:</b> ${arr.length}</p><table><tr><th>Data</th><th>Origem</th><th>Destino</th><th>Veículo</th><th>Valor (R$)</th></tr>${rows}</table><div class="total">TOTAL: R$ ${Number(c.total||0).toFixed(2).replace('.',',')}</div></body></html>`;
+  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url; a.download=`fechamento_${c.number}_corrigido.xls`; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+
+function initClientComparison(){
+  const de=document.getElementById('cmpDataDe');
+  const ate=document.getElementById('cmpDataAte');
+  if(!de || !ate) return;
+  const now=new Date();
+  const first=new Date(now.getFullYear(),now.getMonth(),1);
+  de.value=first.toISOString().slice(0,10);
+  ate.value=now.toISOString().slice(0,10);
+  compareClients();
+}
+
+
+function updateOperationalBrain(force){
+  const box=document.getElementById('brainKpis');
+  if(!box || typeof db==='undefined') return;
+  const rows=(db.services||[]).filter(s=>Number(s.valor||s.faturamento||s.value||0)>0);
+  const value=s=>Number(s.valor||s.faturamento||s.value||0);
+  const cost=s=>serviceCostValue(s);
+  const profit=s=>value(s)-cost(s);
+  const margin=s=>value(s)?profit(s)/value(s)*100:0;
+  const money2=v=>money(v);
+  if(!rows.length){
+    box.innerHTML='<div class="result warn"><b>⚠️ Ainda não há dados suficientes.</b><p>Registre alguns serviços para o Cérebro Operacional começar a gerar diagnóstico e recomendações.</p></div>';
+    ['brainDiagnosis','brainRisk','brainOpportunity','brainAction'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='Aguardando dados.'});
+    document.getElementById('brainAlerts').innerHTML='<p class="muted">Nenhum alerta ainda.</p>';
+    document.getElementById('brainTrend').innerHTML='<p class="muted">Registre serviços para criar o comparativo.</p>';
+    return;
+  }
+  const fat=rows.reduce((a,s)=>a+value(s),0), costs=rows.reduce((a,s)=>a+cost(s),0), profitTotal=fat-costs, avgMargin=fat?profitTotal/fat*100:0;
+  const positive=rows.filter(s=>profit(s)>0).length, positiveRate=positive/rows.length*100;
+  const received=rows.filter(s=>String(s.status||'').toLowerCase()==='recebido').reduce((a,s)=>a+value(s),0);
+  const receivable=Math.max(0,fat-received);
+  const avgFreight=fat/rows.length;
+  const avgProfit=profitTotal/rows.length;
+  const lowMargin=rows.filter(s=>margin(s)<30);
+  const negative=rows.filter(s=>profit(s)<=0);
+  const clientMap={}, vehicleMap={}, routeMap={};
+  rows.forEach(s=>{
+    const client=clientName(s.clientId); clientMap[client]=(clientMap[client]||0)+profit(s);
+    const vehicle=vehicleLabelBrain(s); if(vehicle!=='Não informado') vehicleMap[vehicle]=(vehicleMap[vehicle]||0)+profit(s);
+    const route=`${s.origem||'—'} → ${s.destino||'—'}`; routeMap[route]=(routeMap[route]||0)+profit(s);
+  });
+  const bestClient=Object.entries(clientMap).sort((a,b)=>b[1]-a[1])[0];
+  const bestVehicle=Object.entries(vehicleMap).sort((a,b)=>b[1]-a[1])[0];
+  const bestRoute=Object.entries(routeMap).sort((a,b)=>b[1]-a[1])[0];
+  let score=100;
+  if(avgMargin<30) score-=25; else if(avgMargin<35) score-=10;
+  if(positiveRate<90) score-=20; else if(positiveRate<100) score-=8;
+  if(receivable>fat*0.3) score-=15; else if(receivable>fat*0.15) score-=7;
+  if(lowMargin.length/rows.length>0.3) score-=15;
+  if(negative.length) score-=Math.min(15,negative.length*5);
+  score=Math.max(0,Math.round(score));
+  let cls=score>=80?'good':score>=60?'warn':'bad';
+  let diagnosis=score>=80?'A operação está saudável e com boa disciplina de margem.':score>=60?'A operação é lucrativa, mas existem pontos que precisam de atenção.':'A operação apresenta riscos financeiros relevantes e precisa de correção antes de buscar crescimento.';
+  let risk=negative.length?`${negative.length} frete(s) com lucro zero ou prejuízo.`:lowMargin.length?`${lowMargin.length} frete(s) abaixo de 30% de margem.`:'Nenhum risco crítico de margem identificado.';
+  if(receivable>fat*0.3) risk+=' O contas a receber também está elevado.';
+  let opportunity=bestClient?`Concentrar relacionamento em ${bestClient[0]}, que gera ${money2(bestClient[1])} de lucro no histórico.`:'Aumentar o volume de dados para identificar oportunidades.';
+  let action=negative.length?'Revisar os fretes com prejuízo e ajustar preço/custos antes de aceitar novos semelhantes.':lowMargin.length?'Revisar os fretes abaixo de 30% e usar o preço recomendado antes de fechar.':receivable>fat*0.15?'Priorizar a cobrança dos valores em aberto e atualizar os recebimentos.':'Manter a política atual e buscar mais volume nas rotas/clientes de melhor retorno.';
+  box.innerHTML=`<div class="kpi"><span>Score operacional</span><strong class="brain-score">${score}/100</strong><small class="brain-small">${cls==='good'?'Saudável':cls==='warn'?'Atenção':'Crítico'}</small></div><div class="kpi"><span>Margem média</span><strong>${avgMargin.toFixed(1)}%</strong></div><div class="kpi"><span>Fretes lucrativos</span><strong>${positiveRate.toFixed(0)}%</strong></div><div class="kpi"><span>Lucro médio/frete</span><strong>${money2(avgProfit)}</strong></div><div class="kpi"><span>A receber</span><strong>${money2(receivable)}</strong></div>`;
+  const set=(id,text)=>{const e=document.getElementById(id);if(e)e.textContent=text};
+  set('brainDiagnosis',diagnosis);set('brainRisk',risk);set('brainOpportunity',opportunity);set('brainAction',action);
+  const alerts=[];
+  if(negative.length) alerts.push(`<div class="brain-alert bad"><b>🔴 ${negative.length} frete(s) sem lucro</b><br><span class="brain-small">Não trate esses serviços como padrão comercial. Identifique a causa antes de repetir a operação.</span></div>`);
+  if(lowMargin.length) alerts.push(`<div class="brain-alert warn"><b>🟡 ${lowMargin.length} frete(s) abaixo de 30%</b><br><span class="brain-small">Use a análise de frete e o preço recomendado para evitar erosão de margem.</span></div>`);
+  if(receivable>fat*0.15) alerts.push(`<div class="brain-alert warn"><b>💰 ${money2(receivable)} a receber</b><br><span class="brain-small">Atualize os pagamentos e priorize os clientes com maior saldo aberto.</span></div>`);
+  if(bestClient) alerts.push(`<div class="brain-alert good"><b>🏆 Melhor cliente por lucro: ${esc(bestClient[0])}</b><br><span class="brain-small">Lucro acumulado nos serviços registrados: ${money2(bestClient[1])}.</span></div>`);
+  if(bestVehicle) alerts.push(`<div class="brain-alert good"><b>🚛 Melhor veículo: ${esc(bestVehicle[0])}</b><br><span class="brain-small">Lucro acumulado nos serviços identificados: ${money2(bestVehicle[1])}.</span></div>`);
+  document.getElementById('brainAlerts').innerHTML=alerts.join('')||'<p class="muted">Nenhum alerta identificado.</p>';
+
+  const now=new Date(), today=now.toISOString().slice(0,10);
+  const cutoff=new Date(now); cutoff.setDate(cutoff.getDate()-30); const cutoffStr=cutoff.toISOString().slice(0,10);
+  const recent=rows.filter(s=>String(s.date||'')>=cutoffStr);
+  const prior=rows.filter(s=>String(s.date||'')<cutoffStr);
+  const calc=a=>{const f=a.reduce((x,s)=>x+value(s),0),c=a.reduce((x,s)=>x+cost(s),0);return {f,p:f-c,m:f?(f-c)/f*100:0,n:a.length}};
+  const r=calc(recent), p=calc(prior);
+  const delta=(a,b)=>b===0?(a>0?'novo': '—'):(a-b);
+  const marginDelta=delta(r.m,p.m), fatDelta=delta(r.f,p.f);
+  document.getElementById('brainTrend').innerHTML=`<div class="trend-grid"><div class="trend-card"><span>Últimos 30 dias</span><strong>${money2(r.f)}</strong><small class="brain-small">${r.n} frete(s)</small></div><div class="trend-card"><span>Margem 30 dias</span><strong>${r.m.toFixed(1)}%</strong><small class="brain-small">${typeof marginDelta==='number'?(marginDelta>=0?'+':'')+marginDelta.toFixed(1)+' p.p. vs. período anterior':marginDelta}</small></div><div class="trend-card"><span>Lucro 30 dias</span><strong>${money2(r.p)}</strong><small class="brain-small">vs. ${money2(p.p)} anterior</small></div><div class="trend-card"><span>Faturamento</span><strong>${typeof fatDelta==='number'?(fatDelta>=0?'+':'')+money2(fatDelta):fatDelta}</strong><small class="brain-small">variação vs. período anterior</small></div></div>`;
+}
+
+function vehicleLabelBrain(s){
+  const id=s?.vehicleId ?? s?.veiculoId;
+  const v=(db.vehicles||[]).find(x=>String(x.id)===String(id));
+  if(v?.nome) return v.nome;
+  if((db.vehicles||[]).length===1) return db.vehicles[0].nome;
+  return s?.veiculo || s?.vehicleNome || 'Não informado';
+}
+
+document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>updateOperationalBrain(false),300));
+
+
+
+/* ================= V16 — EXPERIÊNCIA ASSISTIDA ================= */
+function v16Money(v){return money(Number(v)||0)}
+function v16ServiceCost(s){return serviceCostValue(s)}
+function v16Value(s){return Number(s.valor)||0}
+function v16ClientName(id){return (db.clients||[]).find(c=>String(c.id)===String(id))?.nome||'Cliente não informado'}
+function v16BuildFocus(){
+  const box=document.getElementById('v16Focus'); if(!box) return;
+  const rows=(db.services||[]).filter(s=>v16Value(s)>0);
+  const fat=rows.reduce((a,s)=>a+v16Value(s),0);
+  const cost=rows.reduce((a,s)=>a+v16ServiceCost(s),0);
+  const profit=fat-cost;
+  const received=rows.filter(s=>String(s.status||'').toLowerCase()==='recebido').reduce((a,s)=>a+v16Value(s),0);
+  const receivable=Math.max(0,fat-received);
+  const bad=rows.filter(s=>v16Value(s)>0 && (v16Value(s)-v16ServiceCost(s))<=0).length;
+  const low=rows.filter(s=>v16Value(s)>0 && ((v16Value(s)-v16ServiceCost(s))/v16Value(s))<.30).length;
+  const clients={}; rows.forEach(s=>{const n=v16ClientName(s.clientId);clients[n]=(clients[n]||0)+(v16Value(s)-v16ServiceCost(s));});
+  const best=Object.entries(clients).sort((a,b)=>b[1]-a[1])[0];
+  let actionTitle='Tudo em ordem'; let actionText='Continue registrando os serviços. O Assistente acompanha sua operação.'; let cls='action';
+  if(bad){actionTitle='Corrigir fretes';actionText=`${bad} frete(s) ficaram sem lucro. Revise preço e custos antes de repetir.`;cls='bad'}
+  else if(receivable>0){actionTitle='Priorizar recebimentos';actionText=`Você tem ${v16Money(receivable)} em aberto. Atualize os recebimentos e priorize a cobrança.`;cls='warn'}
+  else if(low){actionTitle='Revisar margens';actionText=`${low} frete(s) ficaram abaixo de 30%. Use o preço recomendado.`;cls='warn'}
+  box.innerHTML=`
+    <div class="focus-card"><span>Hoje</span><strong>${v16Money(fat)}</strong><p>Faturamento registrado</p></div>
+    <div class="focus-card"><span>Lucro</span><strong>${v16Money(profit)}</strong><p>Resultado dos serviços</p></div>
+    <div class="focus-card ${receivable>0?'warn':''}"><span>A receber</span><strong>${v16Money(receivable)}</strong><p>${receivable?'Valores ainda não recebidos':'Nenhuma pendência financeira'}</p></div>
+    <div class="focus-card ${cls}"><span>Próxima ação</span><strong>${actionTitle}</strong><p>${actionText}</p></div>`;
+}
+function v16Reply(html, cls='good'){const out=document.getElementById('v16Response');if(out)out.innerHTML=`<div class="result ${cls}">${html}</div>`}
+function v16Quick(type){
+  if(type==='frete'){document.getElementById('v16Command').value='';v16Reply('<b>🚛 Vamos registrar um frete.</b><p>Descreva em uma frase, por exemplo: “Frete para Cliente X, Contagem para Betim, R$ 4.500, diesel R$ 350 e pedágio R$ 80.”</p>');document.getElementById('v16Command').focus();return}
+  if(type==='receber'){const rows=(db.services||[]).filter(s=>v16Value(s)>0 && String(s.status||'').toLowerCase()!=='recebido');const total=rows.reduce((a,s)=>a+v16Value(s),0);const names={};rows.forEach(s=>{const n=v16ClientName(s.clientId);names[n]=(names[n]||0)+v16Value(s)});const top=Object.entries(names).sort((a,b)=>b[1]-a[1])[0];v16Reply(`<b>💰 Você tem ${v16Money(total)} a receber.</b><p>${rows.length} serviço(s) pendente(s). ${top?`Maior saldo: <b>${esc(top[0])}</b> — ${v16Money(top[1])}.`:''}</p><div class="actions"><button class="green" onclick="document.getElementById('contasReceber')?.scrollIntoView({behavior:'smooth'})">Abrir recebimentos</button></div>`, total?'warn':'good');return}
+  if(type==='fechamento'){document.getElementById('contasReceber')?.scrollIntoView({behavior:'smooth'});v16Reply('<b>📄 Fechamento pronto para usar.</b><p>Selecione cliente e período na área de Contas a Receber e gere o fechamento.</p>');return}
+  if(type==='gestao'){const box=document.getElementById('painelGestao');box?.scrollIntoView({behavior:'smooth'});v16Reply('<b>📊 Abrindo a gestão.</b><p>O painel detalhado continua disponível, mas o Assistente mostra primeiro apenas o que exige ação.</p>');return}
+}
+function v16HandleCommand(){
+  const text=(document.getElementById('v16Command')?.value||'').trim(); if(!text){v16Reply('<b>Digite o que aconteceu.</b><p>Ex.: “Fiz um frete para Empresa ABC de Contagem para Betim por R$ 4.500.”</p>','warn');return}
+  const low=text.toLowerCase();
+  if(/quanto|receber|pendente|devo receber|a receber/.test(low)){v16Quick('receber');return}
+  if(/fechamento|fechar|faturamento do cliente/.test(low)){v16Quick('fechamento');return}
+  if(/como está|como esta|minha operação|minha operacao|resultado|lucro|margem/.test(low)){v16Quick('gestao');return}
+  if(/frete|serviço|servico|viagem|carga/.test(low)){
+    const smart=document.getElementById('smartText'); if(smart){smart.value=text;document.querySelector('.more-tools')?.setAttribute('open','');interpretSmart();document.getElementById('smartResult')?.scrollIntoView({behavior:'smooth',block:'center'});}
+    v16Reply('<b>🧠 Entendi que você está registrando um frete.</b><p>Preparei os dados no Assistente Inteligente. Confira e confirme antes de salvar.</p>');return
+  }
+  v16Reply('<b>Posso resolver isso.</b><p>Tente falar em linguagem natural: “fiz um frete…”, “quanto tenho a receber?”, “gere um fechamento” ou “como está minha operação?”.</p>','warn');
+}
+document.addEventListener('DOMContentLoaded',()=>setTimeout(v16BuildFocus,450));
+
+</script>
