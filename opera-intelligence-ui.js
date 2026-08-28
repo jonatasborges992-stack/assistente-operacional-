@@ -48,4 +48,32 @@ window.interpretSmart=function(){
    }
  }catch(err){console.error('OPERA ONE interpreter',err);out.innerHTML='<div class="result bad"><b>⚠️ Erro interno de interpretação.</b><p>O texto foi preservado. Edite e tente novamente.</p></div>';}
 };
+
+/* V9.2.5 — botão Falar visível na ENTRADA PRINCIPAL. */
+function addMainVoiceButton(){
+ const cmd=document.querySelector('.assist-home .assist-command');
+ if(!cmd||document.getElementById('operaMainVoiceBtn'))return;
+ const btn=document.createElement('button');
+ btn.id='operaMainVoiceBtn';btn.type='button';btn.className='green opera-main-voice-btn';btn.textContent='🎙️ Falar';
+ btn.onclick=mainVoiceToggle;
+ cmd.appendChild(btn);
+ const st=document.createElement('div');st.id='operaMainVoiceStatus';st.className='muted';st.style.marginTop='8px';st.setAttribute('aria-live','polite');st.textContent='🎙️ Toque em Falar para lançar por voz.';
+ cmd.parentNode.insertBefore(st,cmd.nextSibling);
+}
+let mainRec=null,mainListening=false;
+function mainVoiceToggle(){
+ const b=document.getElementById('operaMainVoiceBtn'),st=document.getElementById('operaMainVoiceStatus'),f=document.getElementById('v16Command');
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(mainListening&&mainRec){try{mainRec.stop()}catch(e){}return;}
+ if(!SR){if(st)st.textContent='⚠️ Seu navegador não oferece reconhecimento de voz. Use o ditado do teclado.';return;}
+ mainRec=new SR();mainRec.lang='pt-BR';mainRec.continuous=false;mainRec.interimResults=true;mainRec.maxAlternatives=3;mainListening=true;
+ if(b)b.textContent='⏹️ Parar';if(st)st.textContent='🎙️ Ouvindo... fale o lançamento completo.';
+ mainRec.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript+' ';if(f)f.value=t.trim();if(e.results[e.results.length-1].isFinal){if(st)st.textContent='🧠 Interpretando sua fala...';setTimeout(()=>window.v16HandleCommand(),0)}};
+ mainRec.onerror=e=>{if(st)st.textContent='⚠️ '+(e.error==='not-allowed'?'Permissão do microfone bloqueada.':e.error==='no-speech'?'Não ouvi sua fala.':'Não foi possível reconhecer a voz.');};
+ mainRec.onend=()=>{mainListening=false;if(b)b.textContent='🎙️ Falar';if(st&&!st.textContent.startsWith('⚠️'))st.textContent='🎙️ Pronto para novo lançamento.';};
+ try{mainRec.start()}catch(e){mainListening=false;if(b)b.textContent='🎙️ Falar';if(st)st.textContent='⚠️ Não foi possível iniciar o microfone.';}
+}
+function bootMainVoice(){addMainVoiceButton();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootMainVoice);else bootMainVoice();
+setTimeout(bootMainVoice,300);setTimeout(bootMainVoice,1000);setTimeout(bootMainVoice,2000);
 })();
