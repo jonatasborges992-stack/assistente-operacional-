@@ -7,13 +7,13 @@ function wordValue(s){let a=s.split(/\s+e\s+|\s+/),total=0,cur=0;for(const x of 
 A.num=v=>{let s=String(v??'').trim().toLowerCase().replace(/r\$/g,'').replace(/reais?/g,'').trim();if(!s)return 0;if(/[a-z]/.test(s)){const w=wordValue(s);if(w)return w}let m=/^([0-9]+(?:[.,][0-9]+)?)\s*mil$/.exec(s.replace(/\s+/g,''));if(m)return A.num(m[1])*1000;s=s.replace(/\s/g,'');if(s.includes('.')&&s.includes(','))s=s.replace(/\./g,'').replace(',','.');else if(s.includes(','))s=s.replace(',','.');else if(/^\d+\.\d{3}$/.test(s))s=s.replace('.','');return Number(s)||0};
 A.amounts=t=>{let r=[],m,re=/(?:r\$\s*)?([0-9]+(?:\.[0-9]{3})*(?:,[0-9]+)?|[0-9]+(?:[.,][0-9]+)?)(?:\s*mil)?/gi;while((m=re.exec(t))){const raw=m[0];if(/^\d+$/.test(raw)&&!/(?:r\$|valor|frete|combust|diesel|pedag|hotel|aliment|manut|terceir|diar|hora|paguei|cobrei|faturei)/i.test(t.slice(Math.max(0,m.index-45),m.index+45)))continue;r.push([m.index,raw,A.num(m[1]+(/\bmil\b/i.test(raw)?' mil':''))]);}return r};
 
-/* Pré-processador semântico: transforma fala/digitação imperfeita em uma forma estável para o motor. */
+/* Pré-processador semântico: corrige ruído de fala/digitação sem alterar a intenção ou os valores. */
 A.correctText=function(text){let s=String(text??'').replace(/[\n\r]+/g,' ').replace(/\s+/g,' ').trim();
  const fixes=[
- [/\bmartin\s+minas\b/gi,'Mart Minas'],[/\bmartim\s+minas\b/gi,'Mart Minas'],[/\bmart\s+minas\b/gi,'Mart Minas'],
+ [/\bmartin\s+minas\b/gi,'Mart Minas'],[/\bmartim\s+minas\b/gi,'Mart Minas'],
  [/\bterceirizados?\b/gi,'terceirizado'],[/\bterceirizadas?\b/gi,'terceirizado'],[/\bterceirizacao\b/gi,'terceirização'],
  [/\bcombustivel\b/gi,'combustível'],[/\bpedagio\b/gi,'pedágio'],[/\balimentacao\b/gi,'alimentação'],[/\bmanutencao\b/gi,'manutenção'],[/\bdiarias?\b/gi,'diária'],[/\bhora[s]?\s+extra[s]?\b/gi,'horas extras'],
- [/\bpra\b/gi,'para'],[/\bpro\b/gi,'para o'],[/\bpro\s+mart\b/gi,'para Mart'],
+ [/\bpra\b/gi,'para'],[/\bpro\b/gi,'para'],
  [/\bpaguei\s+(?:o|os|a|as)\s+terceirizado[s]?\b/gi,'paguei ao terceirizado'],[/\bpaguei\s+(?:para|pro)\s+terceirizado[s]?\b/gi,'paguei ao terceirizado'],
  [/\bgastei\s+de\s+/gi,'gastei '],[/\bno\s+valor\s+de\s+(?!r\$)/gi,'no valor de R$ '],[/\bvalor\s+de\s+(?!r\$)/gi,'valor de R$ '],
  [/\br\$\s*/gi,'R$ ']
