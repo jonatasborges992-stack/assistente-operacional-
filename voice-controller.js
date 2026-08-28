@@ -1,10 +1,11 @@
-/* OPERA ONE — Voz + Assistente Inteligente V5
+/* OPERA ONE — Voz + Assistente Inteligente V6
    Entrada única na primeira tela: teclado e voz usam o mesmo Assistente Inteligente.
+   O botão principal da primeira tela também usa o mesmo interpretador.
 */
 (function(){
 'use strict';
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-const KEY='opera_one_voice_unified_v5';
+const KEY='opera_one_voice_unified_v6';
 let rec=null,state='idle',finalText='',interim='',timer=null,userStop=false;
 const input=()=>document.getElementById('v16Command');
 const clean=s=>String(s||'').replace(/\s+/g,' ').trim();
@@ -23,8 +24,24 @@ function unify(d){
 }
 function save(){try{sessionStorage.setItem(KEY,JSON.stringify({text:clean(finalText),state}))}catch(e){}}
 function load(){try{const x=JSON.parse(sessionStorage.getItem(KEY)||'null');if(x&&x.text){finalText=clean(x.text);state='paused'}}catch(e){}}
+function sendToAssistant(text){
+ const smart=document.getElementById('smartText');if(!smart)return false;
+ smart.value=clean(text);
+ if(typeof window.interpretSmart==='function'){try{window.interpretSmart();return true}catch(e){console.error(e)}}
+ return false;
+}
+function analyzeUnified(){
+ const el=input();if(!el)return;
+ const text=clean(el.value);if(!text)return;
+ sendToAssistant(text);
+ const tools=document.querySelector('.more-tools');if(tools)tools.setAttribute('open','');
+ setTimeout(()=>document.getElementById('smartResult')?.scrollIntoView({behavior:'smooth',block:'center'}),80);
+}
 function build(d){
- const el=input();if(!el)return false;unify(d);if(d.getElementById('operaVoicePanel'))return true;style(d);
+ const el=input();if(!el)return false;unify(d);if(d.getElementById('operaVoicePanel')){window.v16HandleCommand=analyzeUnified;return true}style(d);
+ const command=el.parentElement;
+ const resolver=command?.querySelector('button');
+ if(resolver){resolver.textContent='Analisar operação';resolver.className='green';resolver.onclick=analyzeUnified}
  const p=d.createElement('section');p.id='operaVoicePanel';p.innerHTML=`<p id="operaVoiceStatus">🎙️ <b>Assistente pronto.</b> Fale naturalmente ou digite seu lançamento.</p><div class="opv-grid"><button type="button" id="operaVoiceStart" class="opv opv-main">🎙️ Falar</button><button type="button" id="operaVoicePause" class="opv opv-soft" disabled>⏸️ Pausar</button><button type="button" id="operaVoiceCorrect" class="opv opv-soft" disabled>✏️ Corrigir</button><button type="button" id="operaVoiceClear" class="opv opv-danger" disabled>🗑️ Apagar tudo</button><button type="button" id="operaVoiceDone" class="opv opv-dark" disabled>✓ Concluir e analisar</button></div><div id="operaVoiceLive">🟢 <b>Ouvindo continuamente.</b> Pode fazer pausas; o texto fica protegido.</div><div id="operaVoiceHelp">✏️ <b>Uma única entrada:</b> o que você falar ou digitar aqui será enviado ao mesmo Assistente Inteligente. Não é necessário lançar o frete novamente em outra tela.</div>`;
  el.parentNode.insertBefore(p,el.nextSibling);
  const $=id=>p.querySelector('#'+id),start=$('operaVoiceStart'),pause=$('operaVoicePause'),correct=$('operaVoiceCorrect'),clear=$('operaVoiceClear'),done=$('operaVoiceDone'),status=$('operaVoiceStatus'),live=$('operaVoiceLive');
@@ -35,16 +52,8 @@ function build(d){
  function pauseSession(){finalText=clean(el.value);interim='';state='paused';userStop=true;clearTimeout(timer);try{rec?.stop()}catch(e){}render();el.focus()}
  function correctSession(){if(state==='listening')pauseSession();else{finalText=clean(el.value);el.focus()}status.innerHTML='✏️ <b>Modo correção.</b> Ajuste o texto e continue.';save()}
  function erase(){userStop=true;clearTimeout(timer);try{rec?.abort()}catch(e){}finalText='';interim='';el.value='';state='paused';try{sessionStorage.removeItem(KEY)}catch(e){}render();status.innerHTML='🗑️ <b>Tudo apagado.</b> Pode começar novamente.'}
- function finish(){
-   finalText=clean(el.value);interim='';userStop=true;clearTimeout(timer);try{rec?.stop()}catch(e){}state='idle';el.value=finalText;try{sessionStorage.removeItem(KEY)}catch(e){}render();
-   // A mesma entrada da primeira tela alimenta diretamente o motor do Assistente Inteligente.
-   const smart=document.getElementById('smartText');if(smart)smart.value=finalText;
-   if(typeof window.interpretSmart==='function'){try{window.interpretSmart()}catch(e){console.error(e)}}
-   document.querySelector('.more-tools')?.setAttribute('open','');
-   document.getElementById('smartResult')?.scrollIntoView({behavior:'smooth',block:'center'});
-   status.innerHTML='✅ <b>Lançamento enviado ao Assistente.</b> Confira os dados antes de confirmar.';
- }
- el.addEventListener('input',()=>{if(state!=='listening'){finalText=clean(el.value);interim='';render()}});start.onclick=listen;pause.onclick=()=>state==='paused'?listen():pauseSession();correct.onclick=correctSession;clear.onclick=erase;done.onclick=finish;load();render();return true}
+ function finish(){finalText=clean(el.value);interim='';userStop=true;clearTimeout(timer);try{rec?.stop()}catch(e){}state='idle';el.value=finalText;try{sessionStorage.removeItem(KEY)}catch(e){}render();sendToAssistant(finalText);const tools=document.querySelector('.more-tools');if(tools)tools.setAttribute('open','');setTimeout(()=>document.getElementById('smartResult')?.scrollIntoView({behavior:'smooth',block:'center'}),80);status.innerHTML='✅ <b>Lançamento enviado ao Assistente.</b> Confira os dados antes de confirmar.'}
+ el.addEventListener('input',()=>{if(state!=='listening'){finalText=clean(el.value);interim='';render()}});start.onclick=listen;pause.onclick=()=>state==='paused'?listen():pauseSession();correct.onclick=correctSession;clear.onclick=erase;done.onclick=finish;load();render();window.v16HandleCommand=analyzeUnified;return true}
 function boot(){if(build(document))return;const o=new MutationObserver(()=>{if(build(document))o.disconnect()});o.observe(document.documentElement,{childList:true,subtree:true});setTimeout(()=>o.disconnect(),15000)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
