@@ -18,20 +18,27 @@ iframe{width:100%;height:100%;border:0;display:block;background:#02050c}
 </style>
 </head>
 <body>
-<div id="app"><iframe id="operaFrame" src="./index.html?v=9.2.7" title="OPERA ONE — Gestão Inteligente de Operações"></iframe></div>
+<div id="app"><iframe id="operaFrame" src="./index.html?v=9.2.8" title="OPERA ONE — Gestão Inteligente de Operações"></iframe></div>
 <button id="install" class="install">＋ Instalar OPERA ONE</button>
 <script>
-if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js?v=6').catch(()=>{})}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js?v=7').catch(()=>{})}
 let deferredPrompt;const btn=document.getElementById('install');window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;btn.classList.add('show')});btn.addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;btn.classList.remove('show')});window.addEventListener('appinstalled',()=>btn.classList.remove('show'));
 const frame=document.getElementById('operaFrame');
-function installScripts(){try{const doc=frame.contentDocument;if(!doc)return;if(!doc.getElementById('opera-ui-v6')){const l=doc.createElement('link');l.id='opera-ui-v6';l.rel='stylesheet';l.href='./opera-ui-v5.css?v=9.2.7';doc.head.appendChild(l)}
-if(!doc.getElementById('opera-intelligence-loader')){const a=doc.createElement('script');a.id='opera-intelligence-loader';a.src='./opera-intelligence.js?v=9.2.7';a.defer=true;doc.body.appendChild(a)}
-if(!doc.getElementById('opera-main-assistant-loader')){const m=doc.createElement('script');m.id='opera-main-assistant-loader';m.src='./opera-main-assistant.js?v=9.2.7';m.defer=true;doc.body.appendChild(m)}
-if(!doc.getElementById('opera-voice-loader')){const s=doc.createElement('script');s.id='opera-voice-loader';s.src='./voice-controller-v4.js?v=9.2.7';s.defer=true;doc.body.appendChild(s)}
-if(!doc.getElementById('opera-fix-v5')){const f=doc.createElement('script');f.id='opera-fix-v5';f.src='./opera-fix-v5.js?v=9.2.7';f.defer=true;doc.body.appendChild(f)}
+function installScripts(){try{const doc=frame.contentDocument;if(!doc)return;if(!doc.getElementById('opera-ui-v6')){const l=doc.createElement('link');l.id='opera-ui-v6';l.rel='stylesheet';l.href='./opera-ui-v5.css?v=9.2.8';doc.head.appendChild(l)}
+if(!doc.getElementById('opera-intelligence-loader')){const a=doc.createElement('script');a.id='opera-intelligence-loader';a.src='./opera-intelligence.js?v=9.2.8';a.defer=true;doc.body.appendChild(a)}
+if(!doc.getElementById('opera-main-assistant-loader')){const m=doc.createElement('script');m.id='opera-main-assistant-loader';m.src='./opera-main-assistant.js?v=9.2.8';m.defer=true;doc.body.appendChild(m)}
+if(!doc.getElementById('opera-voice-loader')){const s=doc.createElement('script');s.id='opera-voice-loader';s.src='./voice-controller-v4.js?v=9.2.8';s.defer=true;doc.body.appendChild(s)}
+if(!doc.getElementById('opera-fix-v5')){const f=doc.createElement('script');f.id='opera-fix-v5';f.src='./opera-fix-v5.js?v=9.2.8';f.defer=true;doc.body.appendChild(f)}
 installAudioButton(doc);
 }catch(e){console.warn('OPERA ONE:',e)}}
-function installAudioButton(doc){const field=doc.getElementById('v16Command');if(!field)return;let wrap=doc.getElementById('operaDirectAudioTools');if(wrap)return;wrap=doc.createElement('div');wrap.id='operaDirectAudioTools';wrap.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px';wrap.innerHTML='<button id="operaDirectAudio" type="button" style="min-height:52px;border:0;border-radius:14px;background:linear-gradient(135deg,#0879ff,#18d5ec);color:#fff;font-size:16px;font-weight:800">🎙️ Áudio</button><button id="operaDirectType" type="button" style="min-height:52px;border:1px solid #bfd2e5;border-radius:14px;background:#fff;color:#122238;font-size:16px;font-weight:800">⌨️ Digitar</button>';field.parentNode.appendChild(wrap);const status=doc.createElement('div');status.id='operaDirectAudioStatus';status.style.cssText='font-size:13px;color:#9fb5ca;margin-top:8px;font-weight:700';status.textContent='🎙️ Toque em Áudio para falar o lançamento. O texto permanece no mesmo campo.';wrap.parentNode.appendChild(status);let rec=null,listening=false,finalText='';const clean=s=>String(s||'').replace(/\s+/g,' ').trim();const audio=wrap.querySelector('#operaDirectAudio');const type=wrap.querySelector('#operaDirectType');function set(t){status.textContent=t}function start(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){set('⚠️ Áudio não disponível neste navegador. Use Digitar.');field.focus();return}if(listening){try{rec.stop()}catch(e){}return}rec=new SR();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=3;finalText=clean(field.value);listening=true;audio.textContent='⏹️ Parar áudio';set('🟢 Ouvindo… você pode fazer pausas. O texto já reconhecido permanece salvo.');rec.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i],t=r[0]?.transcript||'';if(r.isFinal)finalText=clean(finalText+' '+t);else interim+=t+' '}field.value=clean(finalText+' '+interim);field.dispatchEvent(new Event('input',{bubbles:true}))};rec.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){set('⚠️ Microfone bloqueado. Autorize o microfone ou use Digitar.')}else set('🟡 Interrupção detectada. O texto foi preservado; continue falando.')};rec.onend=()=>{if(!listening)return;setTimeout(()=>{if(listening)try{rec.start()}catch(e){}},500)};try{rec.start()}catch(e){listening=false;audio.textContent='🎙️ Áudio';set('⚠️ Não foi possível iniciar o microfone.')}}function stop(){listening=false;if(rec)try{rec.stop()}catch(e){}audio.textContent='🎙️ Áudio';set('⏸️ Áudio pausado. O texto permanece no campo para corrigir ou continuar.')};audio.onclick=()=>listening?stop():start();type.onclick=()=>{if(listening)stop();field.focus();set('⌨️ Digitação ativa. Você pode corrigir o texto diretamente.')}}
+function installAudioButton(doc){
+ const field=doc.getElementById('v16Command');if(!field)return;
+ /* O lançamento agora tem uma única área. O botão de áudio é criado pelo
+    controlador unificado dentro de #operaVoicePanel; não duplicar aqui. */
+ if(doc.getElementById('operaVoicePanel'))return;
+ if(doc.getElementById('operaDirectAudioTools'))return;
+ setTimeout(()=>installAudioButton(doc),300);
+}
 frame.addEventListener('load',()=>{installScripts();setTimeout(()=>installAudioButton(frame.contentDocument),700);setTimeout(()=>installAudioButton(frame.contentDocument),1800)});setTimeout(installScripts,1200);setTimeout(()=>installAudioButton(frame.contentDocument),2500);
 </script>
 </body>
