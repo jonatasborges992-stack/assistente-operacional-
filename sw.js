@@ -1,4 +1,4 @@
-const CACHE='opera-one-app-v932';
+const CACHE='opera-one-app-v933';
 const APP=['./app.html','./index.html','./manifest.webmanifest','./icon.svg','./opera-one.css','./opera-ui-v5.css','./opera-fix-v5.js','./opera-main-assistant.js','./voice-controller-v4.js','./voice-controller-v8.js','./ui-assistente-unificado.js','./audio-launcher-v1.js','./opera-intelligence.js','./opera-intelligence-core.js','./opera-intelligence-entities.js','./opera-intelligence-parser.js','./opera-intelligence-ui.js','./opera-intelligence-tests.js'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(APP)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))).then(()=>self.clients.claim())))});
