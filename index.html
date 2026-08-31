@@ -816,6 +816,34 @@ document.addEventListener("DOMContentLoaded",()=>setTimeout(initClientComparison
 </script>
 <script src="./voice-controller.js?v=1"></script>
 <script src="./ui-assistente-unificado.js?v=1"></script>
+<script id="opera-root-v15">
+(()=>{
+  const MARK='OPERA ONE V15 ROOT PATCH';
+  function boot(){
+    document.querySelectorAll('#voiceV9,#voiceV8,#operaVoicePanel').forEach(e=>e.remove());
+    document.querySelectorAll('.more-tools .card').forEach(c=>{const h=c.querySelector('h2');if(h&&/assistente inteligente/i.test(h.textContent||''))c.remove()});
+    document.querySelectorAll('#voiceBtn,#voiceStatus').forEach(e=>{if(e) e.remove()});
+    if(document.getElementById('opera-root-v15-ui')) return;
+    const cmd=document.querySelector('.assist-home .assist-command');
+    const field=document.getElementById('v16Command');
+    if(!cmd||!field) return;
+    const box=document.createElement('div');box.id='opera-root-v15-ui';box.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px';
+    box.innerHTML='<button id="operaRootAudio" type="button" class="green" style="min-height:54px;font-size:17px">🎙️ Falar</button><button id="operaRootType" type="button" class="secondary" style="min-height:54px;font-size:17px">⌨️ Digitar</button><button id="operaRootPause" type="button" class="secondary" disabled style="min-height:50px">⏸️ Pausar</button><button id="operaRootClear" type="button" class="danger" disabled style="min-height:50px">🗑️ Apagar tudo</button>';
+    cmd.after(box);
+    const st=document.createElement('div');st.id='operaRootVoiceStatus';st.className='muted';st.style.marginTop='8px';st.textContent='🎙️ Fale normalmente. Pausas não apagam o texto. Você pode corrigir pelo teclado.';box.after(st);
+    let rec=null,listening=false,base='';
+    const sync=()=>{const has=!!field.value.trim();document.getElementById('operaRootPause').disabled=!has;document.getElementById('operaRootClear').disabled=!has;document.getElementById('operaRootAudio').textContent=listening?'⏹️ Parar áudio':'🎙️ Falar'};
+    const start=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){st.textContent='⚠️ Áudio não disponível neste navegador. Use ⌨️ Digitar.';return}if(listening){listening=false;try{rec&&rec.stop()}catch(e){}st.textContent='⏸️ Pausado. Texto preservado.';sync();return}base=field.value.trim();rec=new SR();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=3;listening=true;st.textContent='🟢 Ouvindo… faça pausas à vontade.';rec.onresult=e=>{let t=base;for(let i=e.resultIndex;i<e.results.length;i++)t=(t+' '+(e.results[i][0]?.transcript||'')).replace(/\s+/g,' ').trim();field.value=t;sync()};rec.onerror=e=>{if(e.error!=='aborted')st.textContent='🟡 Áudio interrompido. O texto reconhecido foi preservado.'};rec.onend=()=>{if(listening){try{rec.start()}catch(e){}}};try{rec.start()}catch(e){listening=false;st.textContent='⚠️ Não foi possível iniciar o microfone.'}sync()};
+    document.getElementById('operaRootAudio').onclick=start;
+    document.getElementById('operaRootType').onclick=()=>{field.focus();st.textContent='⌨️ Digitação ativa. Corrija o texto diretamente.'};
+    document.getElementById('operaRootPause').onclick=()=>{if(listening){listening=false;try{rec&&rec.stop()}catch(e){}st.textContent='⏸️ Pausado. Texto preservado.';sync()}};
+    document.getElementById('operaRootClear').onclick=()=>{listening=false;try{rec&&rec.abort()}catch(e){}field.value='';document.getElementById('v16Response').innerHTML='';st.textContent='🗑️ Lançamento apagado.';sync()};
+    sync();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  setTimeout(boot,500);setTimeout(boot,1500);
+})();
+</script>
 </body>
 </html>
 <script>
@@ -1237,7 +1265,35 @@ function renderClosurePreview(c){
 function openClosure(id){const c=db.closures.find(x=>x.id===id);if(!c)return;const arr=c.servicesSnapshot||closureServices(c),client=clientById(c.clientId);receivablePreview.innerHTML=`<div class="result good"><b>✅ ${esc(c.number)} salvo</b><p><b>${esc(client?.nome||'Cliente')}</b> • ${esc(c.periodStart)} a ${esc(c.periodEnd)} • ${arr.length} serviço(s) • <strong>${money(c.total)}</strong></p><div class="actions"><button class="green" onclick="exportClosureExcel(${c.id})">📊 Salvar Excel</button><button class="green" onclick="printClosurePDF(${c.id})">📄 Salvar/Imprimir PDF</button><button onclick="shareClosure(${c.id})">📤 Enviar</button><button class="secondary" onclick="showClosureDetail(${c.id})">🔎 Detalhar serviços</button></div></div>`;renderClosuresHistory();}
 function showClosureDetail(id){const c=db.closures.find(x=>x.id===id);if(!c)return;const arr=c.servicesSnapshot||closureServices(c);receivablePreview.innerHTML=`<div class="result"><b>Detalhamento — ${esc(c.number)}</b><table><tr><th>Data</th><th>Rota</th><th>Veículo</th><th>Frete</th><th>Custos</th><th>Lucro</th></tr>${arr.map(s=>`<tr><td>${esc(s.date)}</td><td>${esc(s.origem||'—')} → ${esc(s.destino||'—')}</td><td>${esc(closureVehicleName(s,arr)||'—')}</td><td>${money(s.valor)}</td><td>${money(serviceCostValue(s))}</td><td>${money(Number(s.valor||0)-serviceCostValue(s))}</td></tr>`).join('')}</table><div class="actions"><button class="green" onclick="exportClosureExcel(${c.id})">📊 Salvar Excel</button><button class="green" onclick="printClosurePDF(${c.id})">📄 Salvar/Imprimir PDF</button><button class="secondary" onclick="openClosure(${c.id})">Voltar</button></div></div>`;}
 function renderClosuresHistory(){if(!closuresHistory)return;const arr=db.closures||[];closuresHistory.innerHTML=arr.length?`<div class="result"><h3>📚 Histórico de fechamentos</h3><table><tr><th>Nº</th><th>Cliente</th><th>Período</th><th>Total</th><th>Status</th><th>Ação</th></tr>${arr.slice().reverse().map(c=>`<tr><td>${esc(c.number)}</td><td>${esc(clientById(c.clientId)?.nome||'—')}</td><td>${esc(c.periodStart)} → ${esc(c.periodEnd)}</td><td>${money(c.total)}</td><td>${esc(c.status)}</td><td><button class="secondary" style="padding:7px 10px" onclick="openClosure(${c.id})">Abrir</button></td></tr>`).join('')}</table></div>`:'<p class="muted">Nenhum fechamento salvo.</p>';}
-function closureHtml(c){const client=clientById(c.clientId),arr=c.servicesSnapshot||closureServices(c);return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${esc(c.number)}</title><style>@page{size:A4;margin:12mm}body{font-family:Arial;color:#17202a;font-size:12px}h1{font-size:22px;margin:0}.head{border-bottom:2px solid #17202a;padding-bottom:12px;margin-bottom:14px}.meta{display:grid;grid-template-columns:1fr 1fr;gap:6px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{padding:7px;border-bottom:1px solid #ddd;text-align:left}th{background:#f2f4f7}.total{text-align:right;font-size:18px;font-weight:bold;margin-top:16px}.foot{margin-top:24px;color:#64748b;font-size:10px}</style></head><body><div class="head"><h1>ASSISTENTE OPERACIONAL</h1><div>Fechamento de Serviços</div></div><div class="meta"><div><b>Fechamento:</b> ${esc(c.number)}</div><div><b>Emissão:</b> ${esc(c.createdAt)}</div><div><b>Cliente:</b> ${esc(client?.nome||'—')}</div><div><b>CNPJ:</b> ${esc(client?.cnpj||'—')}</div><div><b>Período:</b> ${esc(c.periodStart)} a ${esc(c.periodEnd)}</div><div><b>Serviços:</b> ${arr.length}</div></div><table><tr><th>Data</th><th>Origem</th><th>Destino</th><th>Veículo</th><th>Valor</th></tr>${arr.map(s=>`<tr><td>${esc(s.date)}</td><td>${esc(s.origem||'—')}</td><td>${esc(s.destino||'—')}</td><td>${esc(closureVehicleName(s,arr)||'—')}</td><td>${money(s.valor)}</td></tr>`).join('')}</table><div class="total">TOTAL: ${money(c.total)}</div><div class="foot">Documento gerado pelo Assistente Operacional. Os serviços permanecem vinculados ao fechamento para conferência.</div></body></html>`;}
+function closureHtml(c){const client=clientById(c.clientId),arr=c.servicesSnapshot||closureServices(c);return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${esc(c.number)}</title><style>@page{size:A4;margin:12mm}body{font-family:Arial;color:#17202a;font-size:12px}h1{font-size:22px;margin:0}.head{border-bottom:2px solid #17202a;padding-bottom:12px;margin-bottom:14px}.meta{display:grid;grid-template-columns:1fr 1fr;gap:6px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{padding:7px;border-bottom:1px solid #ddd;text-align:left}th{background:#f2f4f7}.total{text-align:right;font-size:18px;font-weight:bold;margin-top:16px}.foot{margin-top:24px;color:#64748b;font-size:10px}</style></head><body><div class="head"><h1>ASSISTENTE OPERACIONAL</h1><div>Fechamento de Serviços</div></div><div class="meta"><div><b>Fechamento:</b> ${esc(c.number)}</div><div><b>Emissão:</b> ${esc(c.createdAt)}</div><div><b>Cliente:</b> ${esc(client?.nome||'—')}</div><div><b>CNPJ:</b> ${esc(client?.cnpj||'—')}</div><div><b>Período:</b> ${esc(c.periodStart)} a ${esc(c.periodEnd)}</div><div><b>Serviços:</b> ${arr.length}</div></div><table><tr><th>Data</th><th>Origem</th><th>Destino</th><th>Veículo</th><th>Valor</th></tr>${arr.map(s=>`<tr><td>${esc(s.date)}</td><td>${esc(s.origem||'—')}</td><td>${esc(s.destino||'—')}</td><td>${esc(closureVehicleName(s,arr)||'—')}</td><td>${money(s.valor)}</td></tr>`).join('')}</table><div class="total">TOTAL: ${money(c.total)}</div><div class="foot">Documento gerado pelo Assistente Operacional. Os serviços permanecem vinculados ao fechamento para conferência.</div><script id="opera-root-v15">
+(()=>{
+  const MARK='OPERA ONE V15 ROOT PATCH';
+  function boot(){
+    document.querySelectorAll('#voiceV9,#voiceV8,#operaVoicePanel').forEach(e=>e.remove());
+    document.querySelectorAll('.more-tools .card').forEach(c=>{const h=c.querySelector('h2');if(h&&/assistente inteligente/i.test(h.textContent||''))c.remove()});
+    document.querySelectorAll('#voiceBtn,#voiceStatus').forEach(e=>{if(e) e.remove()});
+    if(document.getElementById('opera-root-v15-ui')) return;
+    const cmd=document.querySelector('.assist-home .assist-command');
+    const field=document.getElementById('v16Command');
+    if(!cmd||!field) return;
+    const box=document.createElement('div');box.id='opera-root-v15-ui';box.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px';
+    box.innerHTML='<button id="operaRootAudio" type="button" class="green" style="min-height:54px;font-size:17px">🎙️ Falar</button><button id="operaRootType" type="button" class="secondary" style="min-height:54px;font-size:17px">⌨️ Digitar</button><button id="operaRootPause" type="button" class="secondary" disabled style="min-height:50px">⏸️ Pausar</button><button id="operaRootClear" type="button" class="danger" disabled style="min-height:50px">🗑️ Apagar tudo</button>';
+    cmd.after(box);
+    const st=document.createElement('div');st.id='operaRootVoiceStatus';st.className='muted';st.style.marginTop='8px';st.textContent='🎙️ Fale normalmente. Pausas não apagam o texto. Você pode corrigir pelo teclado.';box.after(st);
+    let rec=null,listening=false,base='';
+    const sync=()=>{const has=!!field.value.trim();document.getElementById('operaRootPause').disabled=!has;document.getElementById('operaRootClear').disabled=!has;document.getElementById('operaRootAudio').textContent=listening?'⏹️ Parar áudio':'🎙️ Falar'};
+    const start=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){st.textContent='⚠️ Áudio não disponível neste navegador. Use ⌨️ Digitar.';return}if(listening){listening=false;try{rec&&rec.stop()}catch(e){}st.textContent='⏸️ Pausado. Texto preservado.';sync();return}base=field.value.trim();rec=new SR();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=3;listening=true;st.textContent='🟢 Ouvindo… faça pausas à vontade.';rec.onresult=e=>{let t=base;for(let i=e.resultIndex;i<e.results.length;i++)t=(t+' '+(e.results[i][0]?.transcript||'')).replace(/\s+/g,' ').trim();field.value=t;sync()};rec.onerror=e=>{if(e.error!=='aborted')st.textContent='🟡 Áudio interrompido. O texto reconhecido foi preservado.'};rec.onend=()=>{if(listening){try{rec.start()}catch(e){}}};try{rec.start()}catch(e){listening=false;st.textContent='⚠️ Não foi possível iniciar o microfone.'}sync()};
+    document.getElementById('operaRootAudio').onclick=start;
+    document.getElementById('operaRootType').onclick=()=>{field.focus();st.textContent='⌨️ Digitação ativa. Corrija o texto diretamente.'};
+    document.getElementById('operaRootPause').onclick=()=>{if(listening){listening=false;try{rec&&rec.stop()}catch(e){}st.textContent='⏸️ Pausado. Texto preservado.';sync()}};
+    document.getElementById('operaRootClear').onclick=()=>{listening=false;try{rec&&rec.abort()}catch(e){}field.value='';document.getElementById('v16Response').innerHTML='';st.textContent='🗑️ Lançamento apagado.';sync()};
+    sync();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  setTimeout(boot,500);setTimeout(boot,1500);
+})();
+</script>
+</body></html>`;}
 function printClosurePDF(id){const c=db.closures.find(x=>x.id===id);if(!c)return;const w=window.open('','_blank');if(!w){alert('Permita pop-ups para gerar o PDF.');return}w.document.write(closureHtml(c));w.document.close();w.focus();setTimeout(()=>w.print(),300);if(c.status==='Salvo'){c.status='Enviado';localStorage.setItem(KEY,JSON.stringify(db));renderClosuresHistory();}}
 async function shareClosure(id){const c=db.closures.find(x=>x.id===id);if(!c)return;const client=clientById(c.clientId),text=`Fechamento ${c.number}
 Cliente: ${client?.nome||'—'}
@@ -1263,7 +1319,35 @@ function exportClosureExcel(id){
     const value=Number(s.valor||0).toFixed(2).replace('.',',');
     return `<tr><td class="txt">${esc(date)}</td><td class="txt">${esc(origin)}</td><td class="txt">${esc(destination)}</td><td class="txt vehicle">${esc(vehicle)}</td><td class="num">${value}</td></tr>`;
   }).join('');
-  const html=`<html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:1cm}body{font-family:Arial;font-size:11pt}table{border-collapse:collapse;width:100%;margin-top:12px}th,td{border:1px solid #ccc;padding:6px}th{background:#e9edf2}.txt{mso-number-format:"@";white-space:nowrap}.vehicle{mso-number-format:"@";font-weight:normal}.num{mso-number-format:"#,##0.00"}.total{text-align:right;font-size:15pt;font-weight:bold;margin-top:12px}</style></head><body><h1>ASSISTENTE OPERACIONAL — FECHAMENTO DE SERVIÇOS</h1><p><b>Fechamento:</b> ${esc(c.number)} &nbsp; <b>Cliente:</b> ${esc(client?.nome||'—')} &nbsp; <b>CNPJ:</b> ${esc(client?.cnpj||'—')}</p><p><b>Período:</b> ${esc(c.periodStart||'')} a ${esc(c.periodEnd||'')} &nbsp; <b>Serviços:</b> ${arr.length}</p><table><tr><th>Data</th><th>Origem</th><th>Destino</th><th>Veículo</th><th>Valor (R$)</th></tr>${rows}</table><div class="total">TOTAL: R$ ${Number(c.total||0).toFixed(2).replace('.',',')}</div></body></html>`;
+  const html=`<html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:1cm}body{font-family:Arial;font-size:11pt}table{border-collapse:collapse;width:100%;margin-top:12px}th,td{border:1px solid #ccc;padding:6px}th{background:#e9edf2}.txt{mso-number-format:"@";white-space:nowrap}.vehicle{mso-number-format:"@";font-weight:normal}.num{mso-number-format:"#,##0.00"}.total{text-align:right;font-size:15pt;font-weight:bold;margin-top:12px}</style></head><body><h1>ASSISTENTE OPERACIONAL — FECHAMENTO DE SERVIÇOS</h1><p><b>Fechamento:</b> ${esc(c.number)} &nbsp; <b>Cliente:</b> ${esc(client?.nome||'—')} &nbsp; <b>CNPJ:</b> ${esc(client?.cnpj||'—')}</p><p><b>Período:</b> ${esc(c.periodStart||'')} a ${esc(c.periodEnd||'')} &nbsp; <b>Serviços:</b> ${arr.length}</p><table><tr><th>Data</th><th>Origem</th><th>Destino</th><th>Veículo</th><th>Valor (R$)</th></tr>${rows}</table><div class="total">TOTAL: R$ ${Number(c.total||0).toFixed(2).replace('.',',')}</div><script id="opera-root-v15">
+(()=>{
+  const MARK='OPERA ONE V15 ROOT PATCH';
+  function boot(){
+    document.querySelectorAll('#voiceV9,#voiceV8,#operaVoicePanel').forEach(e=>e.remove());
+    document.querySelectorAll('.more-tools .card').forEach(c=>{const h=c.querySelector('h2');if(h&&/assistente inteligente/i.test(h.textContent||''))c.remove()});
+    document.querySelectorAll('#voiceBtn,#voiceStatus').forEach(e=>{if(e) e.remove()});
+    if(document.getElementById('opera-root-v15-ui')) return;
+    const cmd=document.querySelector('.assist-home .assist-command');
+    const field=document.getElementById('v16Command');
+    if(!cmd||!field) return;
+    const box=document.createElement('div');box.id='opera-root-v15-ui';box.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px';
+    box.innerHTML='<button id="operaRootAudio" type="button" class="green" style="min-height:54px;font-size:17px">🎙️ Falar</button><button id="operaRootType" type="button" class="secondary" style="min-height:54px;font-size:17px">⌨️ Digitar</button><button id="operaRootPause" type="button" class="secondary" disabled style="min-height:50px">⏸️ Pausar</button><button id="operaRootClear" type="button" class="danger" disabled style="min-height:50px">🗑️ Apagar tudo</button>';
+    cmd.after(box);
+    const st=document.createElement('div');st.id='operaRootVoiceStatus';st.className='muted';st.style.marginTop='8px';st.textContent='🎙️ Fale normalmente. Pausas não apagam o texto. Você pode corrigir pelo teclado.';box.after(st);
+    let rec=null,listening=false,base='';
+    const sync=()=>{const has=!!field.value.trim();document.getElementById('operaRootPause').disabled=!has;document.getElementById('operaRootClear').disabled=!has;document.getElementById('operaRootAudio').textContent=listening?'⏹️ Parar áudio':'🎙️ Falar'};
+    const start=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){st.textContent='⚠️ Áudio não disponível neste navegador. Use ⌨️ Digitar.';return}if(listening){listening=false;try{rec&&rec.stop()}catch(e){}st.textContent='⏸️ Pausado. Texto preservado.';sync();return}base=field.value.trim();rec=new SR();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=3;listening=true;st.textContent='🟢 Ouvindo… faça pausas à vontade.';rec.onresult=e=>{let t=base;for(let i=e.resultIndex;i<e.results.length;i++)t=(t+' '+(e.results[i][0]?.transcript||'')).replace(/\s+/g,' ').trim();field.value=t;sync()};rec.onerror=e=>{if(e.error!=='aborted')st.textContent='🟡 Áudio interrompido. O texto reconhecido foi preservado.'};rec.onend=()=>{if(listening){try{rec.start()}catch(e){}}};try{rec.start()}catch(e){listening=false;st.textContent='⚠️ Não foi possível iniciar o microfone.'}sync()};
+    document.getElementById('operaRootAudio').onclick=start;
+    document.getElementById('operaRootType').onclick=()=>{field.focus();st.textContent='⌨️ Digitação ativa. Corrija o texto diretamente.'};
+    document.getElementById('operaRootPause').onclick=()=>{if(listening){listening=false;try{rec&&rec.stop()}catch(e){}st.textContent='⏸️ Pausado. Texto preservado.';sync()}};
+    document.getElementById('operaRootClear').onclick=()=>{listening=false;try{rec&&rec.abort()}catch(e){}field.value='';document.getElementById('v16Response').innerHTML='';st.textContent='🗑️ Lançamento apagado.';sync()};
+    sync();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  setTimeout(boot,500);setTimeout(boot,1500);
+})();
+</script>
+</body></html>`;
   const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url; a.download=`fechamento_${c.number}_corrigido.xls`; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
