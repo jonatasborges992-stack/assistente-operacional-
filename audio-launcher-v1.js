@@ -4,11 +4,11 @@ function boot(){
   const input=document.getElementById('v16Command');
   const panel=document.getElementById('operaVoicePanel');
   if(!input||!panel){setTimeout(boot,250);return;}
-  if(document.getElementById('operaAudioMainBtn'))return;
+  if(document.getElementById('operaMainVoiceBtn'))return;
   const grid=panel.querySelector('.opv-grid');
   if(!grid)return;
   const btn=document.createElement('button');
-  btn.id='operaAudioMainBtn';btn.type='button';btn.className='opv opv-main';btn.textContent='🎙️ Falar';btn.setAttribute('aria-label','Falar por áudio');
+  btn.id='operaMainVoiceBtn';btn.type='button';btn.className='opv opv-main';btn.textContent='🎙️ Falar';btn.setAttribute('aria-label','Falar por áudio');
   grid.insertBefore(btn,grid.firstChild);
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   let rec=null,active=false,finalText='',restart=false;
@@ -27,7 +27,7 @@ function boot(){
     rec.onend=()=>{if(!restart)return;setTimeout(()=>{if(!restart)return;try{rec.start()}catch(e){}},450)};
     try{rec.start()}catch(e){setStatus('⚠️ Não foi possível iniciar o microfone. Tente novamente.');}
   }
-  function stop(){restart=false;active=false;try{rec&&rec.stop()}catch(e){}input.value=(finalText||input.value||'').replace(/\s+/g,' ').trim();input.dispatchEvent(new Event('input',{bubbles:true}));render();setStatus('⏸️ <b>Áudio pausado.</b> Texto preservado. Você pode corrigir ou continuar digitando.');}
+  function stop(){restart=false;active=false;try{rec&&rec.stop()}catch(_){}input.value=(finalText||input.value||'').replace(/\s+/g,' ').trim();input.dispatchEvent(new Event('input',{bubbles:true}));render();setStatus('⏸️ <b>Áudio pausado.</b> Texto preservado. Você pode corrigir ou continuar digitando.');}
   btn.onclick=()=>active?stop():start();render();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
