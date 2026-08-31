@@ -1,34 +1,28 @@
-/* OPERA ONE — Áudio integrado ao lançamento único */
+/* OPERA ONE V2 — áudio REAL na área principal de lançamento */
 (function(){'use strict';
 function boot(){
-  const input=document.getElementById('v16Command');
-  const panel=document.getElementById('operaVoicePanel');
-  if(!input||!panel){setTimeout(boot,250);return;}
-  if(document.getElementById('operaMainVoiceBtn'))return;
-  const grid=panel.querySelector('.opv-grid');
-  if(!grid)return;
-  const btn=document.createElement('button');
-  btn.id='operaMainVoiceBtn';btn.type='button';btn.className='opv opv-main';btn.textContent='🎙️ Falar';btn.setAttribute('aria-label','Falar por áudio');
-  grid.insertBefore(btn,grid.firstChild);
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  let rec=null,active=false,finalText='',restart=false;
-  const status=()=>document.getElementById('operaVoiceStatus');
-  function setStatus(t){const e=status();if(e)e.innerHTML=t}
-  function render(){btn.textContent=active?'⏹️ Parar áudio':'🎙️ Falar';btn.setAttribute('aria-pressed',String(active));}
-  function start(){
-    if(!SR){setStatus('⚠️ <b>Áudio não disponível neste navegador.</b> Use ✍️ Digitar e o ditado do teclado.');return;}
-    if(active)return;
-    finalText=String(input.value||'').trim();restart=true;
-    rec=new SR();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=3;
-    try{if('phrases' in rec && window.SpeechRecognitionPhrase){const terms=['frete','terceirizado','terceirizados','terceirização','combustível','diesel','pedágio','manutenção','diária','horas extras','cliente','origem','destino','cobrei','paguei'];rec.phrases=terms.map(x=>new SpeechRecognitionPhrase(x,5))}}catch(e){}
-    rec.onstart=()=>{active=true;render();setStatus('🟢 <b>Ouvindo…</b> fale normalmente. O texto fica preservado.');};
-    rec.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i],t=(r[0]&&r[0].transcript)||'';if(r.isFinal)finalText=(finalText+' '+t).replace(/\s+/g,' ').trim();else interim+=(t+' ')}input.value=(finalText+' '+interim).replace(/\s+/g,' ').trim();input.dispatchEvent(new Event('input',{bubbles:true}));};
-    rec.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){active=false;restart=false;render();setStatus('⚠️ <b>Microfone bloqueado.</b> O texto capturado foi preservado.');}else setStatus('🟡 Interrupção de voz. O texto foi preservado; toque em Falar para continuar.');};
-    rec.onend=()=>{if(!restart)return;setTimeout(()=>{if(!restart)return;try{rec.start()}catch(e){}},450)};
-    try{rec.start()}catch(e){setStatus('⚠️ Não foi possível iniciar o microfone. Tente novamente.');}
-  }
-  function stop(){restart=false;active=false;try{rec&&rec.stop()}catch(_){}input.value=(finalText||input.value||'').replace(/\s+/g,' ').trim();input.dispatchEvent(new Event('input',{bubbles:true}));render();setStatus('⏸️ <b>Áudio pausado.</b> Texto preservado. Você pode corrigir ou continuar digitando.');}
-  btn.onclick=()=>active?stop():start();render();
+ const input=document.getElementById('v16Command'), host=document.querySelector('.assist-command');
+ if(!input||!host){setTimeout(boot,300);return}
+ if(document.getElementById('operaPrimaryAudio'))return;
+ const box=document.createElement('div');box.id='operaPrimaryAudio';box.style.cssText='display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap';
+ const b=document.createElement('button');b.id='operaPrimaryAudioBtn';b.type='button';b.className='green';b.textContent='🎙️ Falar';b.style.cssText='flex:1;min-width:140px';
+ const s=document.createElement('span');s.id='operaPrimaryAudioStatus';s.className='muted';s.textContent='Áudio pronto';s.style.cssText='flex-basis:100%';
+ box.append(b,s);host.parentNode.insertBefore(box,host.nextSibling);
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,active=false,shouldRestart=false,finalText='';
+ function status(t){s.textContent=t}
+ function render(){b.textContent=active?'⏹️ Parar áudio':'🎙️ Falar';b.setAttribute('aria-pressed',String(active))}
+ function start(){
+  if(!SR){status('⚠️ Microfone não disponível. Use o teclado/digitação.');return}
+  if(active)return;finalText=input.value.trim();shouldRestart=true;rec=new SR();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=3;
+  rec.onstart=()=>{active=true;render();status('🟢 Ouvindo… faça pausas à vontade. Nada será apagado.')};
+  rec.onresult=e=>{let inter='';for(let i=e.resultIndex;i<e.results.length;i++){let r=e.results[i],t=r[0]?.transcript||'';if(r.isFinal)finalText=(finalText+' '+t).replace(/\s+/g,' ').trim();else inter+=(t+' ')}input.value=(finalText+' '+inter).replace(/\s+/g,' ').trim();input.dispatchEvent(new Event('input',{bubbles:true}))};
+  rec.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){shouldRestart=false;active=false;render();status('⚠️ Microfone bloqueado. Texto preservado.')}else status('🟡 Pequena interrupção; mantendo o texto…')};
+  rec.onend=()=>{if(shouldRestart)setTimeout(()=>{try{rec.start()}catch(_){}},500)};
+  try{rec.start()}catch(e){status('⚠️ Não foi possível iniciar o áudio. Tente novamente.')}
+ }
+ function stop(){shouldRestart=false;active=false;try{rec?.stop()}catch(_){}input.value=(finalText||input.value).replace(/\s+/g,' ').trim();input.dispatchEvent(new Event('input',{bubbles:true}));render();status('⏸️ Áudio parado. Texto preservado; você pode corrigir e continuar.')}
+ b.onclick=()=>active?stop():start();
+ render();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
