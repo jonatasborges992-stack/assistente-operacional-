@@ -1,0 +1,31 @@
+name: OPERA ONE - garantir audio na entrada principal
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Garantir botão de áudio na entrada principal
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          marker = 'opera-final-launcher.js?v=10.0.0'
+          if marker not in s:
+              tag = '<script src="./opera-final-launcher.js?v=10.0.0"></script>\n'
+              if '</body>' in s:
+                  s = s.replace('</body>', tag + '</body>', 1)
+              else:
+                  s += tag
+              p.write_text(s, encoding='utf-8')
+      - name: Commitar somente se houver alteração
+        run: |
+          git config user.name "OPERA ONE Bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || (git commit -m "fix: garantir botao de audio na entrada principal" && git push)
