@@ -7,22 +7,25 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OPERA ONE">
-<link rel="manifest" href="./manifest.webmanifest?v=11.0.13">
+<link rel="manifest" href="./manifest.webmanifest?v=11.0.14">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <title>OPERA ONE</title>
 </head>
 <body>
 <p style="font-family:Arial,sans-serif;padding:24px">Abrindo OPERA ONE…</p>
 <script>
-(function(){
+(async function(){
   try{
     if('serviceWorker' in navigator){
-      navigator.serviceWorker.getRegistrations().then(function(regs){
-        return Promise.all(regs.map(function(r){return r.unregister();}));
-      }).catch(function(){});
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(function(r){return r.unregister();}));
+    }
+    if('caches' in window){
+      const keys=await caches.keys();
+      await Promise.all(keys.map(function(k){return caches.delete(k);}));
     }
   }catch(e){}
-  setTimeout(function(){location.replace('./opera-one-v11.html?v=11.0.13');},120);
+  location.replace('./opera-one-v11.html?v=11.0.14');
 })();
 </script>
 </body>
