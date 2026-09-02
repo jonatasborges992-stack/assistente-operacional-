@@ -1,7 +1,7 @@
 /* OPERA ONE — Service Worker protegido
    Regra: o SW nunca injeta HTML/scripts nem executa versões antigas.
    Ele somente faz cache/rede dos arquivos declarados pela versão ativa. */
-const APP_VERSION='11.0.2';
+const APP_VERSION='11.0.3';
 const CACHE=`opera-one-${APP_VERSION}`;
 const CORE=['./app.html','./index.html','./opera-one-v11.html','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()))});
