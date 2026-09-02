@@ -1,10 +1,10 @@
-/* OPERA ONE V10.1.2 — final launcher: somente garante a interface principal */
+/* OPERA ONE V10.2 — final launcher: somente o Assistente Principal */
 (function(){'use strict';
   function loadMain(){
-    if(document.getElementById('opera-main-assistant-v1012'))return;
+    if(document.getElementById('opera-main-assistant-v102'))return;
     const s=document.createElement('script');
-    s.id='opera-main-assistant-v1012';
-    s.src='./opera-main-assistant.js?v=10.1.2';
+    s.id='opera-main-assistant-v102';
+    s.src='./opera-main-assistant.js?v=10.2.0';
     s.defer=true;
     s.onerror=()=>console.error('OPERA ONE: Assistente Principal não carregou');
     document.head.appendChild(s);
