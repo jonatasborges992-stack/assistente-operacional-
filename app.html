@@ -12,6 +12,24 @@
 <title>OPERA ONE</title>
 </head>
 <body>
-<script>location.replace('./opera-one-v11.html')</script>
+<p style="font-family:Arial,sans-serif;padding:24px">Abrindo OPERA ONE…</p>
+<script>
+(async()=>{
+  try{
+    const response=await fetch('./opera-one-v11.html',{cache:'no-store'});
+    if(!response.ok)throw new Error('Falha ao carregar o núcleo.');
+    const html=await response.text();
+    document.open();
+    document.write(html);
+    document.close();
+    const loadScript=src=>new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.body.appendChild(s)});
+    await loadScript('./ai-interpreter.js');
+    await loadScript('./opera-ai-bridge.js');
+  }catch(error){
+    document.body.innerHTML='<div style="font-family:Arial,sans-serif;padding:24px"><h2>OPERA ONE</h2><p>Não foi possível carregar o sistema agora.</p><p>Atualize a página e tente novamente.</p></div>';
+    console.error(error);
+  }
+})();
+</script>
 </body>
 </html>
