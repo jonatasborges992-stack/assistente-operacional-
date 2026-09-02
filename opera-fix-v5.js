@@ -1,2 +1,0 @@
-/* OPERA ONE V13 — loader do motor semântico + áudio principal + rota/Maps */
-(function(){'use strict';var v='13.0.0',f=['opera-intelligence-core.js','opera-intelligence-entities.js','opera-intelligence-parser-v10.js','opera-intelligence-ui.js','opera-main-assistant.js','opera-intelligence-tests.js','opera-route-voice-v12.js'];function n(i){if(i>=f.length)return;var s=document.createElement('script');s.src=f[i]+'?v='+v;s.onload=function(){n(i+1)};s.onerror=function(){console.warn('OPERA ONE: módulo não carregado',f[i]);n(i+1)};document.head.appendChild(s)}n(0)})();
