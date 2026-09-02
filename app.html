@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OPERA ONE">
-<link rel="manifest" href="./manifest.webmanifest?v=11.0.15">
+<link rel="manifest" href="./manifest.webmanifest?v=11.0.16">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <title>OPERA ONE</title>
 </head>
@@ -27,18 +27,17 @@
     }
   }catch(e){}
   try{
-    const response=await fetch('./opera-one-v11.html?v=11.0.15',{cache:'no-store'});
+    const response=await fetch('./opera-one-v11.html?v=11.0.16',{cache:'no-store'});
     if(!response.ok)throw new Error('Falha ao carregar o núcleo.');
     const html=await response.text();
     const doc=new DOMParser().parseFromString(html,'text/html');
+    const scriptCode=Array.from(doc.scripts).map(s=>({src:s.src,text:s.textContent||''}));
     document.documentElement.replaceWith(doc.documentElement);
-    const scripts=Array.from(document.querySelectorAll('script'));
-    scripts.forEach(s=>s.remove());
-    const sourceScripts=Array.from(doc.querySelectorAll('script'));
-    for(const source of sourceScripts){
+    Array.from(document.scripts).forEach(s=>s.remove());
+    for(const item of scriptCode){
       const s=document.createElement('script');
-      if(source.src)s.src=source.src;
-      else s.textContent=source.textContent||'';
+      if(item.src)s.src=item.src;
+      else s.textContent=item.text;
       document.body.appendChild(s);
     }
     const inicio=document.getElementById('inicio');
