@@ -1,1 +1,29 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=./app.html"><title>OPERA ONE</title><script>location.replace('./app.html')</script></head><body><p>Abrindo OPERA ONE…</p></body></html>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=./app.html"><title>OPERA ONE</title><script>location.replace('./app.html')</script></head><body><p>Abrindo OPERA ONE…</p><script id="opera-root-v15">
+(()=>{
+  const MARK='OPERA ONE V15 ROOT PATCH';
+  function boot(){
+    document.querySelectorAll('#voiceV9,#voiceV8,#operaVoicePanel').forEach(e=>e.remove());
+    document.querySelectorAll('.more-tools .card').forEach(c=>{const h=c.querySelector('h2');if(h&&/assistente inteligente/i.test(h.textContent||''))c.remove()});
+    document.querySelectorAll('#voiceBtn,#voiceStatus').forEach(e=>{if(e) e.remove()});
+    if(document.getElementById('opera-root-v15-ui')) return;
+    const cmd=document.querySelector('.assist-home .assist-command');
+    const field=document.getElementById('v16Command');
+    if(!cmd||!field) return;
+    const box=document.createElement('div');box.id='opera-root-v15-ui';box.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px';
+    box.innerHTML='<button id="operaRootAudio" type="button" class="green" style="min-height:54px;font-size:17px">🎙️ Falar</button><button id="operaRootType" type="button" class="secondary" style="min-height:54px;font-size:17px">⌨️ Digitar</button><button id="operaRootPause" type="button" class="secondary" disabled style="min-height:50px">⏸️ Pausar</button><button id="operaRootClear" type="button" class="danger" disabled style="min-height:50px">🗑️ Apagar tudo</button>';
+    cmd.after(box);
+    const st=document.createElement('div');st.id='operaRootVoiceStatus';st.className='muted';st.style.marginTop='8px';st.textContent='🎙️ Fale normalmente. Pausas não apagam o texto. Você pode corrigir pelo teclado.';box.after(st);
+    let rec=null,listening=false,base='';
+    const sync=()=>{const has=!!field.value.trim();document.getElementById('operaRootPause').disabled=!has;document.getElementById('operaRootClear').disabled=!has;document.getElementById('operaRootAudio').textContent=listening?'⏹️ Parar áudio':'🎙️ Falar'};
+    const start=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){st.textContent='⚠️ Áudio não disponível neste navegador. Use ⌨️ Digitar.';return}if(listening){listening=false;try{rec&&rec.stop()}catch(e){}st.textContent='⏸️ Pausado. Texto preservado.';sync();return}base=field.value.trim();rec=new SR();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=3;listening=true;st.textContent='🟢 Ouvindo… faça pausas à vontade.';rec.onresult=e=>{let t=base;for(let i=e.resultIndex;i<e.results.length;i++)t=(t+' '+(e.results[i][0]?.transcript||'')).replace(/\s+/g,' ').trim();field.value=t;sync()};rec.onerror=e=>{if(e.error!=='aborted')st.textContent='🟡 Áudio interrompido. O texto reconhecido foi preservado.'};rec.onend=()=>{if(listening){try{rec.start()}catch(e){}}};try{rec.start()}catch(e){listening=false;st.textContent='⚠️ Não foi possível iniciar o microfone.'}sync()};
+    document.getElementById('operaRootAudio').onclick=start;
+    document.getElementById('operaRootType').onclick=()=>{field.focus();st.textContent='⌨️ Digitação ativa. Corrija o texto diretamente.'};
+    document.getElementById('operaRootPause').onclick=()=>{if(listening){listening=false;try{rec&&rec.stop()}catch(e){}st.textContent='⏸️ Pausado. Texto preservado.';sync()}};
+    document.getElementById('operaRootClear').onclick=()=>{listening=false;try{rec&&rec.abort()}catch(e){}field.value='';document.getElementById('v16Response').innerHTML='';st.textContent='🗑️ Lançamento apagado.';sync()};
+    sync();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  setTimeout(boot,500);setTimeout(boot,1500);
+})();
+</script>
+</body></html>
