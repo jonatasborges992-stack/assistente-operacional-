@@ -1,1 +1,42 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#071a39"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="OPERA ONE"><link rel="manifest" href="./manifest.webmanifest?v=11.0.0"><link rel="icon" href="./icon.svg" type="image/svg+xml"><title>OPERA ONE</title><style>html,body{margin:0;width:100%;height:100%;background:#f4f7fb;font-family:Inter,Segoe UI,Arial,sans-serif}#operaApp{width:100%;min-height:100%;background:#f4f7fb}.install{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:20;border:0;border-radius:999px;padding:11px 15px;background:#168cff;color:#fff;font-weight:800;box-shadow:0 10px 30px rgba(0,0,0,.25);display:none}.install.show{display:block}</style></head><body><div id="operaApp"></div><button id="install" class="install">＋ Instalar OPERA ONE</button><script>const APP_VERSION='11.0.0';const target='./opera-one-v11.html?v='+APP_VERSION;fetch(target,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Falha ao carregar OPERA ONE');return r.text()}).then(html=>{document.getElementById('operaApp').innerHTML=html;document.querySelectorAll('#operaApp script').forEach(old=>{const s=document.createElement('script');s.textContent=old.textContent;Array.from(old.attributes).forEach(a=>s.setAttribute(a.name,a.value));old.replaceWith(s)})}).catch(()=>{document.getElementById('operaApp').innerHTML='<div style="padding:30px;font-family:Arial"><h2>OPERA ONE</h2><p>Não foi possível carregar a interface. Atualize a página.</p></div>'});if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v='+APP_VERSION).catch(()=>{});let deferredPrompt;const btn=document.getElementById('install');window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;btn.classList.add('show')});btn.addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;btn.classList.remove('show')});window.addEventListener('appinstalled',()=>btn.classList.remove('show'));</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071a39">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="OPERA ONE">
+<link rel="manifest" href="./manifest.webmanifest?v=11.0.1">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>OPERA ONE</title>
+<style>html,body{margin:0;width:100%;height:100%;background:#f4f7fb;font-family:Inter,Segoe UI,Arial,sans-serif}#operaApp{width:100%;min-height:100%;background:#f4f7fb}.install{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:20;border:0;border-radius:999px;padding:11px 15px;background:#168cff;color:#fff;font-weight:800;box-shadow:0 10px 30px rgba(0,0,0,.25);display:none}.install.show{display:block}</style>
+</head>
+<body>
+<div id="operaApp"></div>
+<button id="install" class="install">＋ Instalar OPERA ONE</button>
+<script>
+/* OPERA ONE 11.0.1 — shell protegido: uma única interface ativa, sem iframe, sem loaders legados e sem injeção de módulos antigos. */
+const APP_VERSION='11.0.1';
+const target='./opera-one-v11.html?v='+APP_VERSION;
+window.operaVoiceRecognition=null;
+window.startVoice=function(){
+  const input=document.getElementById('command'),status=document.getElementById('voiceStatus'),dot=document.getElementById('voiceDot');
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!input||!status||!dot)return;
+  if(!SpeechRecognition){status.textContent='Seu navegador não disponibilizou reconhecimento de voz. Tente Safari ou Chrome atualizado.';dot.classList.remove('live');return;}
+  if(window.operaVoiceRecognition){try{window.operaVoiceRecognition.stop()}catch(e){}window.operaVoiceRecognition=null;dot.classList.remove('live');status.textContent='Voz encerrada. O texto continua editável.';return;}
+  const recognition=new SpeechRecognition();window.operaVoiceRecognition=recognition;
+  recognition.lang='pt-BR';recognition.continuous=false;recognition.interimResults=true;recognition.maxAlternatives=1;
+  status.textContent='Ouvindo… fale o lançamento do frete.';dot.classList.add('live');let finalText='';
+  recognition.onresult=function(event){let interim='';for(let i=event.resultIndex;i<event.results.length;i++){const text=event.results[i][0].transcript;if(event.results[i].isFinal)finalText+=text;else interim+=text;}input.value=(finalText||interim).trim();input.dispatchEvent(new Event('input',{bubbles:true}));status.textContent=interim?'Ouvindo…':'Voz reconhecida. Confira o texto antes de resolver.';};
+  recognition.onerror=function(event){const messages={'not-allowed':'Permissão de microfone negada. Libere o microfone para o OPERA ONE.','audio-capture':'Nenhum microfone disponível.','no-speech':'Não identifiquei fala. Toque em Falar e tente novamente.','network':'Falha de rede no reconhecimento de voz.'};status.textContent=messages[event.error]||'Não foi possível reconhecer a voz. Tente novamente.';dot.classList.remove('live');window.operaVoiceRecognition=null;};
+  recognition.onend=function(){dot.classList.remove('live');if(window.operaVoiceRecognition===recognition)window.operaVoiceRecognition=null;if(input.value.trim())status.textContent='Texto capturado. Confira e toque em Resolver.';};
+  try{recognition.start()}catch(error){dot.classList.remove('live');window.operaVoiceRecognition=null;status.textContent='Não foi possível iniciar o microfone. Tente novamente.';}
+};
+fetch(target,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Falha ao carregar OPERA ONE');return r.text()}).then(html=>{document.getElementById('operaApp').innerHTML=html;document.querySelectorAll('#operaApp script').forEach(old=>{const s=document.createElement('script');s.textContent=old.textContent;Array.from(old.attributes).forEach(a=>s.setAttribute(a.name,a.value));old.replaceWith(s)})}).catch(()=>{document.getElementById('operaApp').innerHTML='<div style="padding:30px;font-family:Arial"><h2>OPERA ONE</h2><p>Não foi possível carregar a interface. Atualize a página.</p></div>'});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v='+APP_VERSION).catch(()=>{});
+let deferredPrompt;const btn=document.getElementById('install');window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;btn.classList.add('show')});btn.addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;btn.classList.remove('show')});window.addEventListener('appinstalled',()=>btn.classList.remove('show'));
+</script>
+</body>
+</html>
