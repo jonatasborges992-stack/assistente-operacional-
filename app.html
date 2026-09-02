@@ -4,31 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#071a39">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="OPERA ONE">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <title>OPERA ONE</title>
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f4f7fb}#operaApp{display:block;width:100%;height:100%;border:0}</style>
 </head>
 <body>
-<p style="font-family:Arial,sans-serif;padding:24px">Abrindo OPERA ONE…</p>
+<iframe id="operaApp" title="OPERA ONE" src="./opera-one-v11.html" allow="microphone"></iframe>
 <script>
-(async()=>{
-  try{
-    const response=await fetch('./opera-one-v11.html',{cache:'no-store'});
-    if(!response.ok)throw new Error('Falha ao carregar o núcleo.');
-    const html=await response.text();
-    document.open();
-    document.write(html);
-    document.close();
-    const loadScript=src=>new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.body.appendChild(s)});
-    await loadScript('./ai-interpreter.js');
-    await loadScript('./opera-ai-bridge.js');
-  }catch(error){
-    document.body.innerHTML='<div style="font-family:Arial,sans-serif;padding:24px"><h2>OPERA ONE</h2><p>Não foi possível carregar o sistema agora.</p><p>Atualize a página e tente novamente.</p></div>';
-    console.error(error);
-  }
+(function(){
+  const frame=document.getElementById('operaApp');
+  function load(src){return new Promise((resolve,reject)=>{const d=frame.contentDocument;if(!d||!d.body)return reject(new Error('Documento do OPERA ONE indisponível.'));const s=d.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;d.body.appendChild(s)})}
+  frame.addEventListener('load',async()=>{
+    try{
+      await load('./ai-interpreter.js');
+      await load('./opera-ai-bridge.js');
+    }catch(error){console.error('OPERA ONE bridge:',error)}
+  });
 })();
 </script>
 </body>
