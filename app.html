@@ -7,11 +7,15 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OPERA ONE">
-<link rel="manifest" href="./manifest.webmanifest?v=11.0.11">
+<link rel="manifest" href="./manifest.webmanifest?v=11.0.12">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <title>OPERA ONE</title>
+</head>
+<body>
+<p id="boot" style="font-family:Arial,sans-serif;padding:24px">Abrindo OPERA ONE…</p>
 <script>
 (async function(){
+  const boot=document.getElementById('boot');
   try{
     if('serviceWorker' in navigator){
       const regs=await navigator.serviceWorker.getRegistrations();
@@ -21,10 +25,19 @@
       const keys=await caches.keys();
       await Promise.all(keys.map(k=>caches.delete(k)));
     }
-  }catch(e){}
-  location.replace('./opera-one-v11.html?v=11.0.11');
+    const response=await fetch('./opera-one-v11.html?v=11.0.12',{cache:'no-store'});
+    if(!response.ok) throw new Error('Falha ao carregar o núcleo. HTTP '+response.status);
+    let html=await response.text();
+    html=html.replace('<section class="view" id="inicio">','<section class="view active" id="inicio">');
+    html=html.replace('async function operaLegacyVoiceDisabled(){','async function startVoice(){');
+    document.open();
+    document.write(html);
+    document.close();
+  }catch(error){
+    if(boot) boot.textContent='Não foi possível abrir o OPERA ONE. Recarregue a página.';
+    console.error('OPERA ONE boot error:',error);
+  }
 })();
 </script>
-</head>
-<body><p style="font-family:Arial,sans-serif;padding:24px">Abrindo OPERA ONE…</p></body>
+</body>
 </html>
