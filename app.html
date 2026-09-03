@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OPERA ONE">
 <meta http-equiv="Cache-Control" content="no-store">
-<link rel="manifest" href="./manifest.webmanifest?v=11.0.18">
+<link rel="manifest" href="./manifest.webmanifest?v=11.0.19">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <title>OPERA ONE</title>
 </head>
@@ -28,7 +28,7 @@
     }
   }catch(e){}
   try{
-    const response=await fetch('./opera-one-v11.html?v=11.0.18',{cache:'no-store'});
+    const response=await fetch('./opera-one-v11.html?v=11.0.19',{cache:'no-store'});
     if(!response.ok)throw new Error('Falha ao carregar o núcleo.');
     let html=await response.text();
     html=html.replace('<section class="view" id="inicio">','<section class="view active" id="inicio">');
@@ -44,6 +44,16 @@
       if(item.src)s.src=item.src;
       else s.textContent=item.text;
       document.body.appendChild(s);
+    }
+    await new Promise(r=>setTimeout(r,0));
+    for(const src of ['./ai-interpreter.js?v=11.0.19','./opera-ai-bridge.js?v=11.0.19']){
+      await new Promise(resolve=>{
+        const s=document.createElement('script');
+        s.src=src;
+        s.onload=resolve;
+        s.onerror=()=>{console.warn('OPERA ONE: módulo opcional não carregado',src);resolve()};
+        document.body.appendChild(s);
+      });
     }
   }catch(error){
     console.error('OPERA ONE boot error:',error);
