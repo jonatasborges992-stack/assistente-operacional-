@@ -6,7 +6,7 @@
   window.__operaAiBridgeLoaded=true;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-  function db(){try{return JSON.parse(localStorage.getItem('assistente_operacional_v5')||'{}')}catch{return {clients:[],vehicles:[]}}}
+  function db(){try{return JSON.parse(localStorage.getItem('assistente_operacional_v5')||'{}')}catch{return {clients:[],vehicles:[],services:[],closures:[]}}}
   function repairReceivableFilter(){const el=document.getElementById('crStatus');if(el&&el.getAttribute('onchange')==='renderReceivables')el.setAttribute('onchange','renderReceivables()')}
   function installFinancialModel(){
     if(typeof window.serviceValue!=='function'||typeof window.serviceCost!=='function')return false;
@@ -26,6 +26,23 @@
       return {fat,cost,profit,received,receivable:Math.max(0,fat-received),margin:fat?profit/fat*100:0};
     };
     window.__operaFinancialModel=true;
+    return true;
+  }
+  function installClosureGuard(){
+    if(typeof window.createClosure!=='function')return false;
+    if(window.createClosure.__operaGuarded)return true;
+    const original=window.createClosure;
+    function guardedClosure(){
+      try{
+        const list=typeof window.filteredReceivables==='function'?window.filteredReceivables():[];
+        const data=db(),closedIds=new Set((data.closures||[]).flatMap(c=>Array.isArray(c.serviceIds)?c.serviceIds.map(String):[]));
+        const reused=list.filter(s=>closedIds.has(String(s.id)));
+        if(reused.length){alert('Há serviço(s) já incluído(s) em fechamento anterior. Remova-os do período/filtro antes de gerar um novo fechamento. Nenhum novo fechamento foi criado.');return;}
+      }catch(e){return original()}
+      return original();
+    }
+    guardedClosure.__operaGuarded=true;
+    window.createClosure=guardedClosure;
     return true;
   }
   function installVoice(){
@@ -60,5 +77,5 @@
     }
     resolveWithAI.__operaAI=true;window.resolveCommand=resolveWithAI;return true;
   }
-  let tries=0;const timer=setInterval(()=>{repairReceivableFilter();installFinancialModel();installVoice();if(installAI()&&window.startVoice&&window.__operaFinancialModel)clearInterval(timer);if(++tries>=100)clearInterval(timer)},100);installFinancialModel();installVoice();repairReceivableFilter();
+  let tries=0;const timer=setInterval(()=>{repairReceivableFilter();installFinancialModel();installClosureGuard();installVoice();if(installAI()&&window.startVoice&&window.__operaFinancialModel&&installClosureGuard())clearInterval(timer);if(++tries>=100)clearInterval(timer)},100);installFinancialModel();installClosureGuard();installVoice();repairReceivableFilter();
 })();
