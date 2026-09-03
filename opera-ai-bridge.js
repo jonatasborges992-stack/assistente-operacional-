@@ -45,6 +45,44 @@
     window.createClosure=guardedClosure;
     return true;
   }
+  function installReceiptIntegrity(){
+    if(typeof window.markReceived==='function'&&!window.markReceived.__operaReceipt){
+      const original=window.markReceived;
+      function wrappedMarkReceived(id){
+        original(id);
+        try{
+          const data=db(),s=(data.services||[]).find(x=>String(x.id)===String(id));
+          if(!s)return;
+          const value=Math.max(0,Number(window.serviceValue(s))||0);
+          s.valorRecebido=value;
+          localStorage.setItem('assistente_operacional_v5',JSON.stringify(data));
+          if(typeof window.refresh==='function')window.refresh();
+        }catch(e){}
+      }
+      wrappedMarkReceived.__operaReceipt=true;
+      window.markReceived=wrappedMarkReceived;
+    }
+    if(typeof window.saveEditedService==='function'&&!window.saveEditedService.__operaReceipt){
+      const original=window.saveEditedService;
+      function wrappedSaveEditedService(){
+        const id=window.__operaEditingServiceId;
+        original();
+        try{
+          if(!id)return;
+          const data=db(),s=(data.services||[]).find(x=>String(x.id)===String(id));
+          if(!s)return;
+          const value=Math.max(0,Number(window.serviceValue(s))||0);
+          if(s.status==='Recebido')s.valorRecebido=value;
+          else s.valorRecebido=0;
+          localStorage.setItem('assistente_operacional_v5',JSON.stringify(data));
+          if(typeof window.refresh==='function')window.refresh();
+        }catch(e){}
+      }
+      wrappedSaveEditedService.__operaReceipt=true;
+      window.saveEditedService=wrappedSaveEditedService;
+    }
+    return typeof window.markReceived==='function'&&typeof window.saveEditedService==='function';
+  }
   function installVoice(){
     if(typeof window.startVoice==='function')return true;
     let recognition=null,listening=false;
@@ -77,5 +115,5 @@
     }
     resolveWithAI.__operaAI=true;window.resolveCommand=resolveWithAI;return true;
   }
-  let tries=0;const timer=setInterval(()=>{repairReceivableFilter();installFinancialModel();installClosureGuard();installVoice();if(installAI()&&window.startVoice&&window.__operaFinancialModel&&installClosureGuard())clearInterval(timer);if(++tries>=100)clearInterval(timer)},100);installFinancialModel();installClosureGuard();installVoice();repairReceivableFilter();
+  let tries=0;const timer=setInterval(()=>{repairReceivableFilter();installFinancialModel();installClosureGuard();installReceiptIntegrity();installVoice();if(installAI()&&window.startVoice&&window.__operaFinancialModel&&installClosureGuard()&&installReceiptIntegrity())clearInterval(timer);if(++tries>=100)clearInterval(timer)},100);installFinancialModel();installClosureGuard();installReceiptIntegrity();installVoice();repairReceivableFilter();
 })();
