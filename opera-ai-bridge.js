@@ -8,6 +8,26 @@
   const money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   function db(){try{return JSON.parse(localStorage.getItem('assistente_operacional_v5')||'{}')}catch{return {clients:[],vehicles:[]}}}
   function repairReceivableFilter(){const el=document.getElementById('crStatus');if(el&&el.getAttribute('onchange')==='renderReceivables')el.setAttribute('onchange','renderReceivables()')}
+  function installFinancialModel(){
+    if(typeof window.serviceValue!=='function'||typeof window.serviceCost!=='function')return false;
+    if(window.__operaFinancialModel)return true;
+    window.serviceReceived=function(s){
+      const value=Math.max(0,Number(window.serviceValue(s))||0);
+      const explicit=Number(s?.valorRecebido);
+      if(Number.isFinite(explicit))return Math.min(value,Math.max(0,explicit));
+      return s?.status==='Recebido'?value:0;
+    };
+    window.stats=function(arr){
+      const list=Array.isArray(arr)?arr:[];
+      const fat=list.reduce((a,s)=>a+(Number(window.serviceValue(s))||0),0);
+      const cost=list.reduce((a,s)=>a+(Number(window.serviceCost(s))||0),0);
+      const profit=fat-cost;
+      const received=list.reduce((a,s)=>a+window.serviceReceived(s),0);
+      return {fat,cost,profit,received,receivable:Math.max(0,fat-received),margin:fat?profit/fat*100:0};
+    };
+    window.__operaFinancialModel=true;
+    return true;
+  }
   function installVoice(){
     if(typeof window.startVoice==='function')return true;
     let recognition=null,listening=false;
@@ -40,5 +60,5 @@
     }
     resolveWithAI.__operaAI=true;window.resolveCommand=resolveWithAI;return true;
   }
-  let tries=0;const timer=setInterval(()=>{repairReceivableFilter();installVoice();if(installAI()&&window.startVoice)clearInterval(timer);if(++tries>=100)clearInterval(timer)},100);installVoice();repairReceivableFilter();
+  let tries=0;const timer=setInterval(()=>{repairReceivableFilter();installFinancialModel();installVoice();if(installAI()&&window.startVoice&&window.__operaFinancialModel)clearInterval(timer);if(++tries>=100)clearInterval(timer)},100);installFinancialModel();installVoice();repairReceivableFilter();
 })();
