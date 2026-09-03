@@ -6,6 +6,7 @@
   window.__operaAiBridgeLoaded=true;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
   function db(){try{return JSON.parse(localStorage.getItem('assistente_operacional_v5')||'{}')}catch{return {clients:[],vehicles:[],services:[],closures:[]}}}
   function repairReceivableFilter(){const el=document.getElementById('crStatus');if(el&&el.getAttribute('onchange')==='renderReceivables')el.setAttribute('onchange','renderReceivables()')}
   function installFinancialModel(){
@@ -108,9 +109,21 @@
       if(!text)return;if(!box){original();return}
       box.innerHTML='<div class="result"><h3>Interpretando…</h3><p>A IA está organizando o lançamento. Nenhum dado foi salvo.</p></div>';
       try{
-        const p=await window.operaAIInterpret(text),data=db(),client=(data.clients||[]).find(c=>String(c.id)===String(p.client_id)),vehicle=(data.vehicles||[]).find(v=>String(v.id)===String(p.vehicle_id)),missing=Array.isArray(p.missing_fields)?p.missing_fields:[];
-        if(!p.client_id||!p.freight_value){const items=missing.length?missing.map(esc).join(', '):'cliente cadastrado e valor do frete';box.innerHTML='<div class="result warn"><h3>Quase lá</h3><p>A interpretação ficou incompleta. Falta: <b>'+items+'</b>.</p><p>Nenhum dado foi salvo.</p></div>';return}
-        const parsed={client,vehicle,value:p.freight_value,origin:p.origin||'',destination:p.destination||'',diesel:p.diesel||0,manut:p.maintenance||0,ped:p.toll||0,ter:p.outsourcing||0,alim:p.food||0},payload=JSON.stringify(parsed).replace(/</g,'\\u003c');
+        const p=await window.operaAIInterpret(text),data=db();
+        const clients=Array.isArray(data.clients)?data.clients:[],vehicles=Array.isArray(data.vehicles)?data.vehicles:[];
+        let client=clients.find(c=>p.client_id!=null&&String(c.id)===String(p.client_id));
+        if(!client&&p.client_name){
+          const target=norm(p.client_name);client=clients.find(c=>norm(c.nome||c.name)===target);
+        }
+        let vehicle=vehicles.find(v=>p.vehicle_id!=null&&String(v.id)===String(p.vehicle_id));
+        if(!vehicle&&p.vehicle_name){
+          const target=norm(p.vehicle_name);vehicle=vehicles.find(v=>norm(v.nome||v.name)===target);
+        }
+        const missing=new Set(Array.isArray(p.missing_fields)?p.missing_fields:[]);
+        if(!client)missing.add('cliente cadastrado');
+        if(!(Number.isFinite(Number(p.freight_value))&&Number(p.freight_value)>0))missing.add('valor do frete');
+        if(missing.size){const items=Array.from(missing).map(esc).join(', ');box.innerHTML='<div class="result warn"><h3>Quase lá</h3><p>A interpretação ficou incompleta. Falta: <b>'+items+'</b>.</p><p>Nenhum dado foi salvo.</p></div>';return}
+        const parsed={client,vehicle,value:Number(p.freight_value),origin:p.origin||'',destination:p.destination||'',diesel:Number(p.diesel)||0,manut:Number(p.maintenance)||0,ped:Number(p.toll)||0,ter:Number(p.outsourcing)||0,alim:Number(p.food)||0},payload=JSON.stringify(parsed).replace(/</g,'\\u003c');
         box.innerHTML='<div class="result good"><h3>✓ Lançamento reconhecido pela IA</h3><p><b>'+esc(client?.nome||p.client_name||'Cliente')+'</b> • '+esc(p.origin||'Origem não informada')+' → '+esc(p.destination||'Destino não informado')+' • <b>'+money(p.freight_value)+'</b></p><p>Custos identificados: combustível '+money(p.diesel)+' • manutenção '+money(p.maintenance)+' • pedágio '+money(p.toll)+(vehicle?' • '+esc(vehicle.nome):'')+'</p><p class="muted">Confira os dados antes de salvar.</p><div class="actions"><button class="green" onclick="applyParsed('+payload+')">Usar no lançamento</button></div></div>';
       }catch(error){box.innerHTML='<div class="result warn"><h3>IA indisponível</h3><p>O lançamento continua disponível pelo interpretador local.</p></div>';setTimeout(()=>original(),350)}
     }
