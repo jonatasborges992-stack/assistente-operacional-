@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OPERA ONE">
 <meta http-equiv="Cache-Control" content="no-store">
-<link rel="manifest" href="./manifest.webmanifest?v=11.0.19">
+<link rel="manifest" href="./manifest.webmanifest?v=11.0.20">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <title>OPERA ONE</title>
 </head>
@@ -21,11 +21,14 @@
     if('caches' in window){const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)))}
   }catch(e){}
   try{
-    const response=await fetch('./opera-one-v11.html?v=11.0.19',{cache:'no-store'});
+    const response=await fetch('./opera-one-v11.html?v=11.0.20',{cache:'no-store'});
     if(!response.ok)throw new Error('Falha ao carregar o núcleo.');
     let html=await response.text();
     html=html.replace('<section class="view" id="inicio">','<section class="view active" id="inicio">');
     html=html.replace('async function operaLegacyVoiceDisabled()','async function startVoice()');
+    const localDateFn=`function operaLocalDate(){const d=new Date();const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())}\n`;
+    html=html.replace('<script>','<script>'+localDateFn);
+    html=html.replace(/new Date\(\)\.toISOString\(\)\.slice\(0,10\)/g,'operaLocalDate()');
     const parserStart=html.indexOf('function parseMoneyText(text)');
     const parserEnd=html.indexOf('function resolveCommand()');
     if(parserStart!==-1&&parserEnd>parserStart){
@@ -38,7 +41,7 @@
     document.head.innerHTML=headHTML;document.body.innerHTML=bodyHTML;
     for(const item of scripts){const s=document.createElement('script');if(item.src)s.src=item.src;else s.textContent=item.text;document.body.appendChild(s)}
     await new Promise(r=>setTimeout(r,0));
-    for(const src of ['./ai-interpreter.js?v=11.0.19','./opera-ai-bridge.js?v=11.0.19'])await new Promise(resolve=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=()=>{console.warn('OPERA ONE: módulo opcional não carregado',src);resolve()};document.body.appendChild(s)});
+    for(const src of ['./ai-interpreter.js?v=11.0.20','./opera-ai-bridge.js?v=11.0.20'])await new Promise(resolve=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=()=>{console.warn('OPERA ONE: módulo opcional não carregado',src);resolve()};document.body.appendChild(s)});
   }catch(error){console.error('OPERA ONE boot error:',error);document.body.innerHTML='<div style="font-family:Arial,sans-serif;padding:24px;color:#0f172a"><div style="font-weight:800;font-size:20px">OPERA ONE</div><div style="margin-top:8px">Não foi possível abrir o sistema agora.</div><button style="margin-top:16px;padding:12px 16px;border:0;border-radius:10px;background:#168cff;color:#fff;font-weight:700" onclick="location.reload()">Tentar novamente</button></div>'}
 })();
 </script>
