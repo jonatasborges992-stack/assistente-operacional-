@@ -38,7 +38,7 @@
         const data=db(),closedIds=new Set((data.closures||[]).flatMap(c=>Array.isArray(c.serviceIds)?c.serviceIds.map(String):[]));
         const reused=list.filter(s=>closedIds.has(String(s.id)));
         if(reused.length){alert('Há serviço(s) já incluído(s) em fechamento anterior. Remova-os do período/filtro antes de gerar um novo fechamento. Nenhum novo fechamento foi criado.');return;}
-      }catch(e){return original()}
+      }catch(e){alert('Não foi possível validar a integridade do fechamento. Nenhum novo fechamento foi criado. Tente novamente.');return}
       return original();
     }
     guardedClosure.__operaGuarded=true;
@@ -69,6 +69,7 @@
         original();
         try{
           if(!id)return;
+          if(window.__operaEditingServiceId===id)return;
           const data=db(),s=(data.services||[]).find(x=>String(x.id)===String(id));
           if(!s)return;
           const value=Math.max(0,Number(window.serviceValue(s))||0);
