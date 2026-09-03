@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OPERA ONE">
 <meta http-equiv="Cache-Control" content="no-store">
-<link rel="manifest" href="./manifest.webmanifest?v=11.0.22">
+<link rel="manifest" href="./manifest.webmanifest?v=11.0.23">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <title>OPERA ONE</title>
 </head>
@@ -21,7 +21,7 @@
     if('caches' in window){const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)))}
   }catch(e){}
   try{
-    const response=await fetch('./opera-one-v11.html?v=11.0.22',{cache:'no-store'});
+    const response=await fetch('./opera-one-v11.html?v=11.0.23',{cache:'no-store'});
     if(!response.ok)throw new Error('Falha ao carregar o núcleo.');
     let html=await response.text();
     html=html.replace('<section class="view" id="inicio">','<section class="view active" id="inicio">');
@@ -43,10 +43,16 @@
       html=html.slice(0,costStart)+financialFns+html.slice(clientStart);
     }
     const deleteStart=html.indexOf('function deleteService(id)');
-    const renderServicesStart=html.indexOf('function renderServices()');
-    if(deleteStart!==-1&&renderServicesStart>deleteStart){
-      const protectedDelete=`function deleteService(id){const used=db.closures.some(c=>Array.isArray(c.serviceIds)&&c.serviceIds.some(x=>String(x)===String(id)));if(used)return alert('Este serviço já foi incluído em um fechamento e não pode ser excluído. Preserve o histórico financeiro.');if(confirm('Excluir este serviço?')){db.services=db.services.filter(x=>x.id!==id);save()}}\n`;
-      html=html.slice(0,deleteStart)+protectedDelete+html.slice(renderServicesStart);
+    const statsStart=html.indexOf('function stats(arr)');
+    if(deleteStart!==-1&&statsStart>deleteStart){
+      const serviceGuards=`function serviceInClosure(id){return db.closures.some(c=>Array.isArray(c.serviceIds)&&c.serviceIds.some(x=>String(x)===String(id)))}\nfunction deleteService(id){if(serviceInClosure(id))return alert('Este serviço já foi incluído em um fechamento e não pode ser excluído. Preserve o histórico financeiro.');if(confirm('Excluir este serviço?')){db.services=db.services.filter(x=>x.id!==id);save()}}\nfunction editService(id){const s=db.services.find(x=>x.id===id);if(!s)return;if(serviceInClosure(id))return alert('Este serviço já foi incluído em um fechamento e não pode ser editado. Preserve o histórico do documento.');go('servicos');sData.value=s.date||operaLocalDate();sCliente.value=s.clientId||'';sVeiculo.value=s.vehicleId||'';sStatus.value=s.status||'Pendente';sOrigem.value=s.origem||'';sDestino.value=s.destino||'';sValor.value=serviceValue(s)||'';sKm.value=num(s.km)||'';sComb.value=num(s.comb)||0;sPed.value=num(s.ped)||0;sTer.value=num(s.ter)||0;sAlim.value=num(s.alimentacao)||0;sHotel.value=num(s.hotel)||0;sDiarias.value=num(s.motoristaDiarias)||0;sHorasQtd.value=num(s.horasExtrasQtd)||0;sHorasRate.value=num(s.horasExtrasValorHora)||0;sHoras.value=num(s.horasExtras)||0;sManut.value=num(s.manutencao)||0;sOutros.value=num(s.outros)||0;window.__operaEditingServiceId=id;focusId('sValor')}\nfunction saveEditedService(){const id=window.__operaEditingServiceId;if(!id)return addService();const s=db.services.find(x=>x.id===id);if(!s)return;if(serviceInClosure(id))return alert('Este serviço já foi incluído em um fechamento e não pode ser editado.');const value=num(sValor.value);if(!num(sCliente.value)||value<=0)return alert('Informe cliente e valor do frete.');Object.assign(s,{date:sData.value||operaLocalDate(),clientId:num(sCliente.value),vehicleId:sVeiculo.value?num(sVeiculo.value):null,status:sStatus.value,origem:sOrigem.value.trim(),destino:sDestino.value.trim(),valor:value,km:num(sKm.value),comb:num(sComb.value),ped:num(sPed.value),ter:num(sTer.value),alimentacao:num(sAlim.value),hotel:num(sHotel.value),motoristaDiarias:num(sDiarias.value),horasExtras:num(sHoras.value),horasExtrasQtd:num(sHorasQtd.value),horasExtrasValorHora:num(sHorasRate.value),manutencao:num(sManut.value),outros:num(sOutros.value)});window.__operaEditingServiceId=null;save();clearServiceForm();alert('Serviço atualizado com sucesso.')}\n`;
+      html=html.slice(0,deleteStart)+serviceGuards+html.slice(statsStart);
+    }
+    const renderStart=html.indexOf('function renderServices()');
+    const statsStart2=html.indexOf('function stats(arr)');
+    if(renderStart!==-1&&statsStart2>renderStart){
+      const renderFn=`function renderServices(){const q=norm(serviceSearch.value);const arr=db.services.filter(s=>!q||norm(clientName(s.clientId)).includes(q)||norm(s.origem).includes(q)||norm(s.destino).includes(q));if(!arr.length){servicesTable.innerHTML='<div class="empty">Nenhum serviço encontrado.</div>';return}servicesTable.innerHTML='<table><thead><tr><th>Data</th><th>Cliente</th><th>Rota</th><th>Veículo</th><th>Frete</th><th>Custos</th><th>Lucro</th><th>Status</th><th></th></tr></thead><tbody>'+arr.slice().reverse().map(s=>{const c=serviceCost(s),p=serviceValue(s)-c,locked=serviceInClosure(s.id);return \`<tr><td>\${esc(s.date)}</td><td>\${esc(clientName(s.clientId))}</td><td>\${esc(s.origem||'—')} → \${esc(s.destino||'—')}</td><td>\${esc(vehicleName(s.vehicleId))}</td><td>\${money(serviceValue(s))}</td><td>\${money(c)}</td><td>\${money(p)}</td><td class="status \${s.status==='Recebido'?'recebido':'pendente'}">\${esc(s.status)}</td><td><button class="secondary" onclick="editService(\${s.id})">\${locked?'Ver':'Editar'}</button> <button class="secondary" onclick="\${s.status==='Recebido'?'void 0':'markReceived('+s.id+')'}">\${s.status==='Recebido'?'Recebido':'Receber'}</button> <button class="danger" onclick="deleteService(\${s.id})">Excluir</button></td></tr>\`}).join('')}</tbody></table>`}\n`;
+      html=html.slice(0,renderStart)+renderFn+html.slice(statsStart2);
     }
     const doc=new DOMParser().parseFromString(html,'text/html');
     const headHTML=doc.head.innerHTML,bodyHTML=doc.body.innerHTML;
@@ -54,7 +60,7 @@
     document.head.innerHTML=headHTML;document.body.innerHTML=bodyHTML;
     for(const item of scripts){const s=document.createElement('script');if(item.src)s.src=item.src;else s.textContent=item.text;document.body.appendChild(s)}
     await new Promise(r=>setTimeout(r,0));
-    for(const src of ['./ai-interpreter.js?v=11.0.22','./opera-ai-bridge.js?v=11.0.22'])await new Promise(resolve=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=()=>{console.warn('OPERA ONE: módulo opcional não carregado',src);resolve()};document.body.appendChild(s)});
+    for(const src of ['./ai-interpreter.js?v=11.0.23','./opera-ai-bridge.js?v=11.0.23'])await new Promise(resolve=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=()=>{console.warn('OPERA ONE: módulo opcional não carregado',src);resolve()};document.body.appendChild(s)});
   }catch(error){console.error('OPERA ONE boot error:',error);document.body.innerHTML='<div style="font-family:Arial,sans-serif;padding:24px;color:#0f172a"><div style="font-weight:800;font-size:20px">OPERA ONE</div><div style="margin-top:8px">Não foi possível abrir o sistema agora.</div><button style="margin-top:16px;padding:12px 16px;border:0;border-radius:10px;background:#168cff;color:#fff;font-weight:700" onclick="location.reload()">Tentar novamente</button></div>'}
 })();
 </script>
